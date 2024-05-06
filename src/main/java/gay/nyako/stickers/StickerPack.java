@@ -3,9 +3,12 @@ package gay.nyako.stickers;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.File;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class StickerPack {
     String name;
@@ -45,5 +48,21 @@ public class StickerPack {
 
     public void addSticker(Sticker sticker) {
         stickers.add(sticker);
+    }
+
+    public void loadStickersFromZip(ArrayList<? extends ZipEntry> entries, ZipFile zipFile) {
+        for (Sticker sticker : stickers) {
+            for (ZipEntry entry : entries) {
+                if (entry.getName().equals(sticker.filename + ".png")) {
+                    try {
+                        InputStream stream = zipFile.getInputStream(entry);
+                        sticker.setImage(stream.readAllBytes());
+                    } catch (Exception e) {
+                        StickersMod.LOGGER.warn("Failed to read sticker file: {}/{}.png", key, sticker.filename);
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 }

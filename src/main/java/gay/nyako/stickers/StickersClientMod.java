@@ -32,7 +32,9 @@ public class StickersClientMod implements ClientModInitializer {
         });
 
         ClientPlayConnectionEvents.INIT.register((handler, client) -> {
-            StickersMod.STICKER_MANAGER.stickerPacks.clear();
+            if (handler.getServerInfo() != null && !handler.getServerInfo().isLocal()) {
+                StickersMod.STICKER_MANAGER.stickerPacks.clear();
+            }
         });
     }
 }

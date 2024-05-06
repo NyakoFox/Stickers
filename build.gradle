@@ -72,6 +72,3 @@ publishing {
 		// retrieving dependencies.
 	}
 }
-
-sourceSets.main.java.srcDirs += [ 'src/main/generatedJava' ]
-compileJava.options.generatedSourceOutputDirectory = file("${projectDir}/src/main/generatedJava/gay/nyako/stickers")

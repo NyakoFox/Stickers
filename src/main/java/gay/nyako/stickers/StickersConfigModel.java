@@ -8,7 +8,6 @@ import io.wispforest.owo.config.annotation.Sync;
 
 import java.util.List;
 
-@Modmenu(modId = "stickers")
 @Config(name = "stickers", wrapperName = "StickersConfig")
 public class StickersConfigModel {
     @Sync(Option.SyncMode.OVERRIDE_CLIENT)

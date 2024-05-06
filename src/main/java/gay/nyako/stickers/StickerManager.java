@@ -13,12 +13,14 @@ import net.minecraft.util.Identifier;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 
 public class StickerManager {
     public Map<String, StickerPack> stickerPacks = new HashMap<>();
@@ -26,7 +28,7 @@ public class StickerManager {
     public StickerManager() {
     }
 
-    public void initialize() {
+    public void loadStickers() {
         Path gameDirectory = FabricLoader.getInstance().getGameDir();
         Path stickerDirectory = gameDirectory.resolve("stickers");
         if (!stickerDirectory.toFile().exists()) {
@@ -38,36 +40,57 @@ public class StickerManager {
         Gson gson = new Gson();
 
         // Loop through child directories
-        File[] directories = stickerDirectory.toFile().listFiles(File::isDirectory);
-        if (directories == null) {
-            StickersMod.LOGGER.warn("No sticker packs found.");
-            return;
-        }
-
+        File[] directories = stickerDirectory.toFile().listFiles();
         for (File directory : directories) {
-            File packJsonFile = FabricLoader.getInstance().getGameDir().resolve(directory.toPath().resolve("pack.json")).toFile();
+            if (directory.isDirectory()) {
+                File packJsonFile = FabricLoader.getInstance().getGameDir().resolve(directory.toPath().resolve("pack.json")).toFile();
 
-            StickersMod.LOGGER.info("Loading sticker pack with ID " + directory.getName());
+                StickersMod.LOGGER.info("Loading sticker pack with ID " + directory.getName());
 
-            if (!packJsonFile.exists()) {
-                StickersMod.LOGGER.warn(packJsonFile.getAbsolutePath());
-                StickersMod.LOGGER.warn("No pack.json file found in " + directory.getName() + ", skipping.");
-                continue;
+                if (!packJsonFile.exists()) {
+                    StickersMod.LOGGER.warn(packJsonFile.getAbsolutePath());
+                    StickersMod.LOGGER.warn("No pack.json file found in " + directory.getName() + ", skipping.");
+                    continue;
+                }
+
+                // load the pack.json file
+                JsonReader reader;
+                try {
+                    reader = new JsonReader(new FileReader(packJsonFile));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                StickerPack pack = gson.fromJson(reader, StickerPack.class);
+                pack.key = directory.getName();
+                pack.loadStickers();
+                stickerPacks.put(directory.getName(), pack);
             }
-
-            // load the pack.json file
-            JsonReader reader;
-            try {
-                reader = new JsonReader(new FileReader(packJsonFile));
-            } catch (Exception e) {
-                e.printStackTrace();
-                return;
+            // else if zip
+            else if (directory.getName().endsWith(".zip")) {
+                try (ZipFile zipFile = new ZipFile(directory)) {
+                    boolean foundPackJson = false;
+                    var key = directory.getName().substring(0, directory.getName().length() - 4);
+                    ArrayList<? extends ZipEntry> entries = Collections.list(zipFile.entries());
+                    for (ZipEntry entry : entries) {
+                        if (entry.getName().equals("pack.json")) {
+                            foundPackJson = true;
+                            StickersMod.LOGGER.info("Loading sticker pack with ID " + key + " (from zip)");
+                            JsonReader reader = new JsonReader(new InputStreamReader(zipFile.getInputStream(entry)));
+                            StickerPack pack = gson.fromJson(reader, StickerPack.class);
+                            pack.key = key;
+                            pack.loadStickersFromZip(entries, zipFile);
+                            stickerPacks.put(pack.key, pack);
+                        }
+                    }
+                    if (!foundPackJson) {
+                        StickersMod.LOGGER.warn("No pack.json file found in " + directory.getName() + ", skipping.");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
-
-            StickerPack pack = gson.fromJson(reader, StickerPack.class);
-            pack.key = directory.getName();
-            pack.loadStickers();
-            stickerPacks.put(directory.getName(), pack);
         }
     }
 
