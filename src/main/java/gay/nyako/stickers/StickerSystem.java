@@ -29,7 +29,7 @@ public class StickerSystem {
             StickerDisplay sticker = iterator.next();
             sticker.tickDelta = tickDelta;
 
-            if (sticker.ticks > StickersMod.CONFIG.stickerTimer - 10)
+            if (sticker.ticks > StickersMod.CONFIG.stickerTimer() - 10)
             {
                 x = drawContext.getScaledWindowWidth();
             }
@@ -44,7 +44,7 @@ public class StickerSystem {
     }
 
     public static void addSticker(Text player, Sticker stickerData, UUID playerUUID) {
-        if (StickersMod.CONFIG.playStickerSound) {
+        if (StickersMod.CONFIG.playStickerSound()) {
             MinecraftClient.getInstance().player.playSound(StickerSoundEvents.STICKER, 1f, 1f);
         }
 
@@ -71,14 +71,14 @@ public class StickerSystem {
             sticker.tick();
             sticker.ticks++;
 
-            if (sticker.ticks > StickersMod.CONFIG.stickerTimer) {
+            if (sticker.ticks > StickersMod.CONFIG.stickerTimer()) {
                 iterator.remove();
             }
         }
     }
 
     public static void showSticker(String pack, Sticker data) {
-        stickerDelay = StickersMod.CONFIG.stickerUsageDelay;
+        stickerDelay = StickersMod.CONFIG.stickerUsageDelay();
         ClientPlayNetworking.send(new SendStickerPayload(pack, data.filename));
     }
 }

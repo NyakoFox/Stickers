@@ -1,8 +1,6 @@
 package gay.nyako.stickers;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
-import me.shedaniel.autoconfig.AutoConfig;
-import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -18,9 +16,11 @@ import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import gay.nyako.stickers.StickersConfig;
+
 public class StickersMod implements ModInitializer {
 
-	public static final StickersConfig CONFIG = AutoConfig.register(StickersConfig.class, GsonConfigSerializer::new).getConfig();
+	public static final StickersConfig CONFIG = StickersConfig.createAndLoad();
 	public static final StickerManager STICKER_MANAGER = new StickerManager();
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("Stickers");
