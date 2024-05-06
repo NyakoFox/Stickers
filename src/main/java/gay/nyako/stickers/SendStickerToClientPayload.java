@@ -7,9 +7,11 @@ import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
 import net.minecraft.text.Text;
 
-public record SendStickerToClientPayload(String string, GameProfile gameProfile) implements CustomPayload {
+public record SendStickerToClientPayload(String pack, String string, GameProfile gameProfile) implements CustomPayload {
     public static final Id<SendStickerToClientPayload> ID = CustomPayload.id("stickers:send_sticker");
     public static final PacketCodec<PacketByteBuf, SendStickerToClientPayload> CODEC = PacketCodec.tuple(
+            PacketCodecs.STRING,
+            SendStickerToClientPayload::pack,
             PacketCodecs.STRING,
             SendStickerToClientPayload::string,
             PacketCodecs.GAME_PROFILE,

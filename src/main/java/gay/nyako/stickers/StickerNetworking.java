@@ -10,16 +10,23 @@ import net.minecraft.text.Text;
 
 public class StickerNetworking {
     public static void registerReceivers() {
+        // Sending stickers
         PayloadTypeRegistry.playC2S().register(SendStickerPayload.ID, SendStickerPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(SendStickerToClientPayload.ID, SendStickerToClientPayload.CODEC);
+
+        // Sticker pack manipulation commands
         PayloadTypeRegistry.playS2C().register(AddStickerPackPayload.ID, AddStickerPackPayload.CODEC);
         PayloadTypeRegistry.playS2C().register(RemoveStickerPackPayload.ID, RemoveStickerPackPayload.CODEC);
+
+        // Sending initial sticker data
+        PayloadTypeRegistry.playS2C().register(SendStickerDataPayload.ID, SendStickerDataPayload.CODEC);
+        PayloadTypeRegistry.playS2C().register(SendStickerPackDataPayload.ID, SendStickerPackDataPayload.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(SendStickerPayload.ID,
                 (payload, context) -> {
                     context.player().server.execute(() -> {
                         context.player().server.getPlayerManager().getPlayerList().forEach((serverPlayerEntity) -> {
-                            ServerPlayNetworking.send(serverPlayerEntity, new SendStickerToClientPayload(payload.string(), context.player().getGameProfile()));
+                            ServerPlayNetworking.send(serverPlayerEntity, new SendStickerToClientPayload(payload.pack(), payload.string(), context.player().getGameProfile()));
                         });
                     });
                 }
@@ -31,7 +38,21 @@ public class StickerNetworking {
         ClientPlayNetworking.registerGlobalReceiver(SendStickerToClientPayload.ID,
                 (payload, context) -> {
                     context.client().execute(() -> {
-                        StickerSystem.addSticker(Text.of(payload.gameProfile().getName()), payload.string(), payload.gameProfile().getId());
+                        StickerPack pack = StickersMod.STICKER_MANAGER.stickerPacks.get(payload.pack());
+                        if (pack == null) {
+                            return;
+                        }
+                        Sticker stickerData = null;
+                        for (Sticker sticker : pack.stickers) {
+                            if (sticker.filename.equals(payload.string())) {
+                                stickerData = sticker;
+                                break;
+                            }
+                        }
+                        if (stickerData == null) {
+                            return;
+                        }
+                        StickerSystem.addSticker(Text.of(payload.gameProfile().getName()), stickerData, payload.gameProfile().getId());
                     });
                 }
         );
@@ -50,6 +71,22 @@ public class StickerNetworking {
                         var collection = ((PlayerEntityAccess) context.client().player).getStickerPackCollection();
                         collection.removeStickerPack(payload.string());
                         ((PlayerEntityAccess) context.client().player).setStickerPackCollection(collection);
+                    });
+                }
+        );
+
+        ClientPlayNetworking.registerGlobalReceiver(SendStickerDataPayload.ID,
+                (payload, context) -> {
+                    context.client().execute(() -> {
+                        StickersMod.STICKER_MANAGER.addStickerFromDataPayload(payload);
+                    });
+                }
+        );
+
+        ClientPlayNetworking.registerGlobalReceiver(SendStickerPackDataPayload.ID,
+                (payload, context) -> {
+                    context.client().execute(() -> {
+                        StickersMod.STICKER_MANAGER.addStickerPackFromDataPayload(payload);
                     });
                 }
         );

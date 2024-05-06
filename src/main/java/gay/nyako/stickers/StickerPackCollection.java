@@ -48,6 +48,7 @@ public class StickerPackCollection extends ArrayList<String> {
     }
 
     public boolean hasStickerPack(String sticker) {
+        if (StickersMod.CONFIG.defaultPacks.contains(sticker)) return true;
         return this.contains(sticker);
     }
 

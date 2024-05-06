@@ -5,21 +5,22 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.PressableWidget;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
-import org.apache.commons.compress.utils.Lists;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class StickerGroupWidget extends PressableWidget {
-    public final String name;
-    public final List<String> stickerNames = Lists.newArrayList();
+    public final StickerPack data;
+    public final List<Sticker> stickerData = new ArrayList<>();
 
     private boolean selected = false;
 
-    public StickerGroupWidget(int x, int y, String name) {
-        super(x, y, 96, 16, Text.of(name));
-        this.name = name;
+    public StickerGroupWidget(int x, int y, StickerPack pack) {
+        super(x, y, 96, 16, Text.of(pack == null ? "All" : pack.name));
+        this.data = pack;
     }
 
     @Override
@@ -51,7 +52,7 @@ public class StickerGroupWidget extends PressableWidget {
             context.setShaderColor(0.8f, 0.8f, 0.8f, this.alpha);
         }
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        var text = Text.translatable("stickers.stickers.pack." + name + ".title");
+        var text = (MutableText) Text.of(data.name);
         if (selected) {
             text = text.setStyle(Style.EMPTY.withUnderline(true));
         }
@@ -61,11 +62,11 @@ public class StickerGroupWidget extends PressableWidget {
     }
 
     public void clearStickers() {
-        stickerNames.clear();
+        stickerData.clear();
     }
 
-    public void addSticker(String name) {
-        stickerNames.add(name);
+    public void addSticker(Sticker data) {
+        stickerData.add(data);
     }
 
     public void select() {

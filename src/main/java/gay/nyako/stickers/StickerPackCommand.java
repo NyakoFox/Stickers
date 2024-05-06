@@ -8,6 +8,7 @@ import gay.nyako.stickers.access.PlayerEntityAccess;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.GameProfileArgumentType;
+import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -42,6 +43,7 @@ public class StickerPackCommand {
                         })
                         .then(CommandManager.literal("add")
                                 .then(CommandManager.argument("stickerpack", StringArgumentType.string())
+                                        .suggests(StickersMod.STICKER_PACK_SUGGESTION_PROVIDER)
                                         .executes(context -> {
                                             // add a sticker pack to the player
                                             Collection<GameProfile> profiles = GameProfileArgumentType.getProfileArgument(context, "player");
@@ -66,6 +68,7 @@ public class StickerPackCommand {
                         )
                         .then(CommandManager.literal("remove")
                                 .then(CommandManager.argument("stickerpack", StringArgumentType.string())
+                                        .suggests(StickersMod.STICKER_PACK_SUGGESTION_PROVIDER)
                                         .executes(context -> {
                                             // remove a sticker pack from the player
                                             Collection<GameProfile> profiles = GameProfileArgumentType.getProfileArgument(context, "player");

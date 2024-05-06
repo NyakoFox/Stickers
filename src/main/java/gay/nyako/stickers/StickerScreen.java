@@ -7,6 +7,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -27,7 +28,6 @@ public class StickerScreen extends Screen {
     private final HashMap<String, StickerGroupWidget> stickerPacks = new HashMap<>();
     private final List<StickerWidget> stickers = Lists.newArrayList();
 
-    private static final String ALL_PACK_KEY = "all";
     private static final String DEFAULT_PACK_KEY = "default";
 
     public StickerScreen() {
@@ -42,43 +42,29 @@ public class StickerScreen extends Screen {
         }
         stickerPacks.clear();
 
-        getStickerGroup(ALL_PACK_KEY);
-        getStickerGroup(DEFAULT_PACK_KEY);
-
-        MinecraftClient.getInstance().getResourceManager()
-                .findAllResources("textures/sticker", id -> id.getPath().endsWith(".png")).forEach(
-                        (resourceID, resource) -> {
-                            String[] path = resourceID.getPath().split("/");
-                            if (path.length == 3)
-                            {
-                                addSticker(DEFAULT_PACK_KEY, path[2].substring(0, path[2].length() - 4));
-                            }
-                            else if (path.length == 4)
-                            {
-                                addStickerPack(path[2], path[3].substring(0, path[3].length() - 4));
-                            }
-                        }
-                );
+        StickersMod.STICKER_MANAGER.stickerPacks.forEach(this::addStickerPack);
 
         orderedStickerPacks = new ArrayList<>(stickerPacks.values());
         orderedStickerPacks.sort((a, b) -> a == b ? 0 :
-                a.name.equals(ALL_PACK_KEY) ? -5000 :
-                        b.name.equals(ALL_PACK_KEY) ? 5000 :
-                                a.name.equals(DEFAULT_PACK_KEY) ? -4000 :
-                                        b.name.equals(DEFAULT_PACK_KEY) ? 4000:
-                                                a.name.compareTo(b.name));
-
-        loadStickerPack(stickerPacks.get(ALL_PACK_KEY));
+            a.data.key.equals(DEFAULT_PACK_KEY) ? -4000 :
+                    b.data.key.equals(DEFAULT_PACK_KEY) ? 4000:
+                            a.data.name.compareTo(b.data.name));
 
         readjustComponents();
+
+        if (!orderedStickerPacks.isEmpty()) {
+            loadStickerPack(orderedStickerPacks.getFirst());
+        }
 
         super.init();
     }
 
-    private void addStickerPack(String pack, String name) {
-        if (((PlayerEntityAccess)MinecraftClient.getInstance().player).getStickerPackCollection().hasStickerPack(pack))
+    private void addStickerPack(String key, StickerPack value) {
+        if (((PlayerEntityAccess)MinecraftClient.getInstance().player).getStickerPackCollection().hasStickerPack(key))
         {
-            addSticker(pack, pack + "/" + name);
+            for (var sticker : value.stickers) {
+                addSticker(key, sticker);
+            }
         }
     }
 
@@ -91,24 +77,22 @@ public class StickerScreen extends Screen {
         clearStickers();
 
         pack.select();
-        for (var name : pack.stickerNames) {
-            StickerWidget button = new StickerWidget(0, 0, name);
+        for (var stickerData : pack.stickerData) {
+            String packID = null;
+            for (var stickerPack : stickerPacks.entrySet()) {
+                if (stickerPack.getValue() == pack) {
+                    packID = stickerPack.getKey();
+                    break;
+                }
+            }
 
-            String packName;
-            if (name.indexOf('/') == -1)
-            {
-                packName = "default";
-            }
-            else
-            {
-                packName = name.substring(0, name.indexOf('/'));
-            }
+            StickerWidget button = new StickerWidget(0, 0, stickerData, packID);
 
             button.setTooltip(Tooltip.of(
                     Text.translatable(
                             "stickers.stickers.sticker_tooltip",
-                            Text.translatable("stickers.stickers.sticker." + name + ".title").formatted(Formatting.AQUA),
-                            Text.translatable("stickers.stickers.pack." + packName + ".title").formatted(Formatting.WHITE)
+                            ((MutableText) Text.of(stickerData.title)).formatted(Formatting.AQUA),
+                            ((MutableText) Text.of(pack.data.name)).formatted(Formatting.WHITE)
                     ).formatted(Formatting.GRAY)
             ));
             this.addDrawableChild(button);
@@ -205,7 +189,7 @@ public class StickerScreen extends Screen {
 
     public StickerGroupWidget getStickerGroup(String pack) {
         if (!stickerPacks.containsKey(pack)) {
-            var widget = new StickerGroupWidget(0, 0, pack);
+            var widget = new StickerGroupWidget(0, 0, StickersMod.STICKER_MANAGER.stickerPacks.get(pack));
             stickerPacks.put(pack, widget);
             this.addDrawableChild(widget);
         }
@@ -213,9 +197,8 @@ public class StickerScreen extends Screen {
         return stickerPacks.get(pack);
     }
 
-    public void addSticker(String pack, String name) {
-        getStickerGroup(ALL_PACK_KEY).addSticker(name);
-        getStickerGroup(pack).addSticker(name);
+    public void addSticker(String pack, Sticker data) {
+        getStickerGroup(pack).addSticker(data);
     }
 
     @Override

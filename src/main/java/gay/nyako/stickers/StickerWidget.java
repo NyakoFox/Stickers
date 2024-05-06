@@ -8,17 +8,17 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 public class StickerWidget extends PressableWidget {
-    public final String name;
-    public final Identifier texture;
-    public StickerWidget(int x, int y, String name) {
-        super(x, y, 64, 64, Text.of(name));
-        this.name = name;
-        texture = new Identifier("stickers", "textures/sticker/" + name + ".png");
+    public final Sticker data;
+    public final String stickerPackId;
+    public StickerWidget(int x, int y, Sticker data, String stickerPackId) {
+        super(x, y, 64, 64, Text.of(data.title));
+        this.data = data;
+        this.stickerPackId = stickerPackId;
     }
 
     @Override
     public void onPress() {
-        for (Sticker sticker : StickerSystem.STICKERS)
+        for (StickerDisplay sticker : StickerSystem.STICKERS)
         {
             if (sticker.playerUUID.equals(MinecraftClient.getInstance().player.getUuid()) && StickerSystem.stickerDelay > 0) {
                 return;
@@ -26,7 +26,7 @@ public class StickerWidget extends PressableWidget {
         }
 
         MinecraftClient.getInstance().setScreen(null);
-        StickerSystem.showSticker(name);
+        StickerSystem.showSticker(stickerPackId, data);
     }
 
     @Override
@@ -45,7 +45,8 @@ public class StickerWidget extends PressableWidget {
         {
             context.setShaderColor(0.8f, 0.8f, 0.8f, this.alpha);
         }
-        context.drawTexture(texture, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
+
+        context.drawTexture(this.data.identifier, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
         context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
     }
 }
