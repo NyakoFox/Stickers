@@ -8,10 +8,7 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.suggestion.SuggestionProviders;
-import net.minecraft.entity.data.TrackedDataHandler;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -29,20 +26,6 @@ public class StickersMod implements ModInitializer {
 		return builder.buildFuture();
 	});
 
-	public static final TrackedDataHandler<StickerPackCollection> STICKER_PACK_COLLECTION_DATA = new TrackedDataHandler<>() {
-		@Override
-		public StickerPackCollection copy(StickerPackCollection stickerPackCollection) {
-			StickerPackCollection newCollection = new StickerPackCollection();
-			newCollection.addAll(stickerPackCollection);
-			return newCollection;
-		}
-
-		@Override
-		public PacketCodec<? super RegistryByteBuf, StickerPackCollection> codec() {
-			return StickerPackCollection.OPTIONAL_PACKET_CODEC;
-		}
-	};
-
 	public static final gay.nyako.stickers.StickersConfig CONFIG = gay.nyako.stickers.StickersConfig.createAndLoad();
 
 	@Override
@@ -50,7 +33,7 @@ public class StickersMod implements ModInitializer {
 		StickerSoundEvents.register();
 		StickerNetworking.registerReceivers();
 
-		TrackedDataHandlerRegistry.register(STICKER_PACK_COLLECTION_DATA);
+		TrackedDataHandlerRegistry.register(TrackedDataHandlers.STICKER_PACK_COLLECTION_DATA);
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			StickerPackCommand.register(dispatcher);

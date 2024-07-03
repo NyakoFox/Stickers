@@ -1,7 +1,7 @@
 package gay.nyako.stickers.mixin;
 
 import gay.nyako.stickers.StickerPackCollection;
-import gay.nyako.stickers.StickersMod;
+import gay.nyako.stickers.TrackedDataHandlers;
 import gay.nyako.stickers.access.PlayerEntityAccess;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEntityAccess {
     @Unique
-    private static final TrackedData<StickerPackCollection> STICKER_PACK_COLLECTION = DataTracker.registerData(PlayerEntity.class, StickersMod.STICKER_PACK_COLLECTION_DATA);
+    private static final TrackedData<StickerPackCollection> STICKER_PACK_COLLECTION = DataTracker.registerData(PlayerEntity.class, TrackedDataHandlers.STICKER_PACK_COLLECTION_DATA);
 
     protected PlayerEntityMixin(EntityType<? extends LivingEntity> entityType, World world) {
         super(entityType, world);

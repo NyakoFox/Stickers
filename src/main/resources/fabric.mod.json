@@ -3,13 +3,13 @@
 	"id": "stickers",
 	"version": "${version}",
 	"name": "Stickers",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Send stickers to your friends!",
 	"authors": [
-		"Me!"
+		"NyakoFox"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "https://nyako.gay/mc/stickers",
+		"sources": "https://github.com/NyakoFox/Stickers"
 	},
 	"license": "CC0-1.0",
 	"icon": "assets/stickers/icon.png",
@@ -29,9 +29,7 @@
 		"fabricloader": ">=0.15.11",
 		"minecraft": ">=1.20.5",
 		"java": ">=21",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
+		"fabric-api": "*",
+		"owo": "*"
 	}
 }
