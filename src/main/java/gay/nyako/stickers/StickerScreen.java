@@ -27,14 +27,9 @@ public class StickerScreen extends Screen {
 
     private final int SIDEBAR_WIDTH = 160;
 
-    private float patreonScroller = 0.0f;
-    private int patreonScrollerDelay = 0;
-    private float rainbowTimer = 0.0f;
-
     private List<StickerGroupWidget> orderedStickerPacks = Lists.newArrayList();
     private final HashMap<String, StickerGroupWidget> stickerPacks = new HashMap<>();
     private final List<StickerWidget> stickers = Lists.newArrayList();
-    private DonateButtonWidget donateButtonWidget;
 
     private static final String DEFAULT_PACK_KEY = "default";
 
@@ -48,9 +43,6 @@ public class StickerScreen extends Screen {
             pack.clearStickers();
             this.remove(pack);
         }
-
-        donateButtonWidget = new DonateButtonWidget(24, this.height - 24);
-        this.addDrawableChild(donateButtonWidget);
 
         stickerPacks.clear();
 
@@ -67,8 +59,6 @@ public class StickerScreen extends Screen {
         if (!orderedStickerPacks.isEmpty()) {
             loadStickerPack(orderedStickerPacks.getFirst());
         }
-
-        patreonScrollerDelay = 40;
 
         super.init();
     }
@@ -133,7 +123,6 @@ public class StickerScreen extends Screen {
     private void readjustComponents() {
         readjustPacks();
         readjustStickers();
-        donateButtonWidget.setY(this.height - 24);
     }
 
     private void readjustPacks() {
@@ -219,12 +208,6 @@ public class StickerScreen extends Screen {
     @Override
     public void tick() {
         super.tick();
-
-        if (patreonScrollerDelay > 0)
-            patreonScrollerDelay--;
-        else
-            patreonScroller++;
-        rainbowTimer++;
     }
 
     @Override
@@ -233,8 +216,6 @@ public class StickerScreen extends Screen {
         super.render(context, mouseX, mouseY, delta);
 
         float scroller = 0;
-        if (patreonScrollerDelay <= 0) scroller = patreonScroller + delta;
-        float rainbowTimerWithDelta = rainbowTimer + delta;
 
         for (Drawable drawable : stickerPacks.values()) {
             context.enableScissor(0, 32, SIDEBAR_WIDTH, this.height - 32);
@@ -244,42 +225,6 @@ public class StickerScreen extends Screen {
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         var label = Text.literal("Sticker Packs").setStyle(Style.EMPTY.withUnderline(true));
         context.drawText(textRenderer, label, 28, 20, 0xFFFFFFFF, true);
-
-        context.drawText(textRenderer, Text.of("Thank you to my supporters:"), SIDEBAR_WIDTH, this.height - 32, 0xFFFFFFFF, true);
-
-        ArrayList<String> tierOrder = new ArrayList<>();
-        tierOrder.add("Rainbow Supporter");
-        tierOrder.add("Deluxe Supporter");
-        tierOrder.add("Supporter");
-
-        MutableText builtText = (MutableText) Text.of("");
-
-        for (var tier : tierOrder) {
-            if (StickersClientMod.PATREON_MEMBERS.containsKey(tier)) {
-                var members = StickersClientMod.PATREON_MEMBERS.get(tier);
-                Style style = switch (tier) {
-                    case "Rainbow Supporter" -> Style.EMPTY.withColor(MathHelper.hsvToRgb(rainbowTimerWithDelta / 60f % 1f, 0.5f, 1f));
-                    case "Deluxe Supporter" -> Style.EMPTY.withColor(Formatting.AQUA);
-                    case "Supporter" -> Style.EMPTY.withColor(Formatting.GRAY);
-                    default -> Style.EMPTY;
-                };
-
-                for (var member : members) {
-                    builtText = builtText.append(((MutableText) Text.of(member)).setStyle(style)).append(Text.of("   "));
-                }
-            }
-        }
-
-        context.enableScissor(SIDEBAR_WIDTH, this.height - 32, this.width, this.height);
-
-        var length = Math.max(this.width - SIDEBAR_WIDTH + 32, textRenderer.getWidth(builtText) + 32);
-        // scroll the text!
-        int offset = (int) scroller % length;
-        context.drawText(textRenderer, builtText, SIDEBAR_WIDTH - offset, this.height - 16, 0xFFFFFFFF, true);
-        // draw it again to loop
-        context.drawText(textRenderer, builtText, SIDEBAR_WIDTH - offset + length, this.height - 16, 0xFFFFFFFF, true);
-
-        context.disableScissor();
 
         this.mouseX = mouseX;
         this.mouseY = mouseY;

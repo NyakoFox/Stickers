@@ -1,6 +1,5 @@
 package gay.nyako.stickers;
 
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;

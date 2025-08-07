@@ -45,11 +45,11 @@ public class StickerManager {
             if (directory.isDirectory()) {
                 File packJsonFile = FabricLoader.getInstance().getGameDir().resolve(directory.toPath().resolve("pack.json")).toFile();
 
-                StickersMod.LOGGER.info("Loading sticker pack with ID " + directory.getName());
+                StickersMod.LOGGER.info("Loading sticker pack with ID {}", directory.getName());
 
                 if (!packJsonFile.exists()) {
                     StickersMod.LOGGER.warn(packJsonFile.getAbsolutePath());
-                    StickersMod.LOGGER.warn("No pack.json file found in " + directory.getName() + ", skipping.");
+                    StickersMod.LOGGER.warn("No pack.json file found in {}, skipping.", directory.getName());
                     continue;
                 }
 
@@ -58,7 +58,7 @@ public class StickerManager {
                 try {
                     reader = new JsonReader(new FileReader(packJsonFile));
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    StickersMod.LOGGER.warn("Failed to read pack.json file in {}, skipping.", directory.getName(), e);
                     return;
                 }
 
@@ -85,10 +85,10 @@ public class StickerManager {
                         }
                     }
                     if (!foundPackJson) {
-                        StickersMod.LOGGER.warn("No pack.json file found in " + directory.getName() + ", skipping.");
+                        StickersMod.LOGGER.warn("No pack.json file found in ZIP {}, skipping.", directory.getName());
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    StickersMod.LOGGER.warn("Failed to read zip file: {}", directory.getName(), e);
                 }
             }
         }
@@ -114,7 +114,7 @@ public class StickerManager {
 
         pack.addSticker(sticker);
 
-        StickersMod.LOGGER.info("Added sticker " + name + " to pack " + packName);
+        StickersMod.LOGGER.debug("Added sticker {} to pack {}", name, packName);
         // let's also register this as a NativeImage
         try {
             NativeImage nativeImage = NativeImage.read(null, new ByteArrayInputStream(image));
@@ -123,8 +123,7 @@ public class StickerManager {
             NativeImageBackedTexture nativeImageBackedTexture = new NativeImageBackedTexture(nativeImage);
             MinecraftClient.getInstance().getTextureManager().registerTexture(sticker.identifier, nativeImageBackedTexture);
         } catch (Exception e) {
-            StickersMod.LOGGER.warn("Failed to load image from byte array");
-            e.printStackTrace();
+            StickersMod.LOGGER.warn("Failed to load image from byte array", e);
         }
     }
 }

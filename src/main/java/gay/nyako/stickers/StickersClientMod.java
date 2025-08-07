@@ -22,9 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class StickersClientMod implements ClientModInitializer {
-
-    public static final HashMap<String, ArrayList<String>> PATREON_MEMBERS = new HashMap<>();
-
     @Override
     public void onInitializeClient() {
         StickerNetworking.registerReceiversClient();
@@ -49,27 +46,6 @@ public class StickersClientMod implements ClientModInitializer {
             if (handler.getServerInfo() != null && !handler.getServerInfo().isLocal()) {
                 StickersMod.STICKER_MANAGER.stickerPacks.clear();
             }
-        });
-
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create("https://nyako.gay/api/patreon/members"))
-                .timeout(Duration.ofMinutes(2))
-                .build();
-        HttpClient.newHttpClient().sendAsync(request, HttpResponse.BodyHandlers.ofString()).thenAccept(response -> {
-            PATREON_MEMBERS.clear();
-            Gson gson = new Gson();
-            gson.fromJson(new StringReader(response.body()), HashMap.class).forEach((key, value) -> {
-                if (key.equals("members")) {
-                    var val = (ArrayList<LinkedTreeMap<String, String>>) value;
-                    for (var member : val) {
-                        if (!PATREON_MEMBERS.containsKey(member.get("tier"))) {
-                            PATREON_MEMBERS.put(member.get("tier"), new ArrayList<>());
-                        }
-                        PATREON_MEMBERS.get(member.get("tier")).add(member.get("member"));
-                    }
-                }
-                //PATREON_MEMBERS.put((String) key, (ArrayList<String>) value);
-            });
         });
     }
 }
