@@ -1,8 +1,10 @@
 package gay.nyako.stickers;
 
+import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -66,6 +68,9 @@ public class StickerSystem {
 
     public static void showSticker(String pack, Sticker data) {
         stickerDelay = StickersMod.CONFIG.stickerUsageDelay();
-        ClientPlayNetworking.send(new SendStickerPayload(pack, data.filename));
+        PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+        buf.writeString(pack);
+        buf.writeString(data.filename);
+        ClientPlayNetworking.send(StickerNetworking.SEND_STICKER, buf);
     }
 }

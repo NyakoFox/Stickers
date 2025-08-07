@@ -1,6 +1,7 @@
 package gay.nyako.stickers;
 
 import com.mojang.brigadier.suggestion.SuggestionProvider;
+import io.netty.buffer.Unpooled;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -9,6 +10,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -47,9 +49,17 @@ public class StickersMod implements ModInitializer {
 			// for key, value
 			for (String stickerPackKey : STICKER_MANAGER.stickerPacks.keySet()) {
 				StickerPack stickerPack = STICKER_MANAGER.stickerPacks.get(stickerPackKey);
-				ServerPlayNetworking.send(handler.player, new SendStickerPackDataPayload(stickerPackKey, stickerPack.name));
+				PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
+				buf.writeString(stickerPackKey);
+				buf.writeString(stickerPack.name);
+				ServerPlayNetworking.send(handler.player, StickerNetworking.SEND_STICKER_PACK_DATA, buf);
 				stickerPack.stickers.forEach(sticker -> {
-					ServerPlayNetworking.send(handler.player, new SendStickerDataPayload(stickerPackKey, sticker.filename, sticker.title, sticker.image));
+					PacketByteBuf stickerBuf = new PacketByteBuf(Unpooled.buffer());
+					stickerBuf.writeString(stickerPackKey);
+					stickerBuf.writeString(sticker.filename);
+					stickerBuf.writeString(sticker.title);
+					stickerBuf.writeByteArray(sticker.image);
+					ServerPlayNetworking.send(handler.player, StickerNetworking.SEND_STICKER_DATA, stickerBuf);
 				});
 			}
 		});

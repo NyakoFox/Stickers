@@ -33,9 +33,9 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerEn
         this.dataTracker.set(STICKER_PACK_COLLECTION, stickerPackCollection);
     }
 
-    @Inject(at = @At("TAIL"), method = "initDataTracker(Lnet/minecraft/entity/data/DataTracker$Builder;)V")
-    private void initDataTracker(DataTracker.Builder builder, CallbackInfo ci) {
-        builder.add(STICKER_PACK_COLLECTION, new StickerPackCollection());
+    @Inject(at = @At("TAIL"), method = "initDataTracker()V")
+    private void initDataTracker(CallbackInfo ci) {
+        this.dataTracker.startTracking(STICKER_PACK_COLLECTION, new StickerPackCollection());
     }
 
     @Inject(at = @At("TAIL"), method = "writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V")

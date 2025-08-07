@@ -94,30 +94,30 @@ public class StickerManager {
         }
     }
 
-    public void addStickerPackFromDataPayload(SendStickerPackDataPayload payload) {
-        StickerPack pack = new StickerPack(payload.name(), new ArrayList<>());
-        pack.key = payload.pack();
-        stickerPacks.put(payload.pack(), pack);
+    public void addStickerPackFromDataPayload(String key, String name) {
+        StickerPack pack = new StickerPack(name, new ArrayList<>());
+        pack.key = key;
+        stickerPacks.put(key, pack);
     }
 
     @Environment(EnvType.CLIENT)
-    public void addStickerFromDataPayload(SendStickerDataPayload payload) {
-        StickerPack pack = stickerPacks.get(payload.pack());
+    public void addStickerFromDataPayload(String packName, String filepath, String name, byte[] image) {
+        StickerPack pack = stickerPacks.get(packName);
         if (pack == null) {
-            StickersMod.LOGGER.warn("Sticker pack " + payload.pack() + " not found, skipping sticker addition");
+            StickersMod.LOGGER.warn("Sticker pack " + packName + " not found, skipping sticker addition");
             return;
         }
 
-        Sticker sticker = new Sticker(payload.filepath(), payload.name());
-        sticker.setImage(payload.image());
-        sticker.setIdentifier(new Identifier("stickers", payload.pack() + "/" + payload.filepath()));
+        Sticker sticker = new Sticker(filepath, name);
+        sticker.setImage(image);
+        sticker.setIdentifier(new Identifier("stickers", packName + "/" + filepath));
 
         pack.addSticker(sticker);
 
-        StickersMod.LOGGER.info("Added sticker " + payload.name() + " to pack " + payload.pack());
+        StickersMod.LOGGER.info("Added sticker " + name + " to pack " + packName);
         // let's also register this as a NativeImage
         try {
-            NativeImage nativeImage = NativeImage.read(null, new ByteArrayInputStream(payload.image()));
+            NativeImage nativeImage = NativeImage.read(null, new ByteArrayInputStream(image));
             sticker.width = nativeImage.getWidth();
             sticker.height = nativeImage.getHeight();
             NativeImageBackedTexture nativeImageBackedTexture = new NativeImageBackedTexture(nativeImage);

@@ -4,31 +4,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
-import net.minecraft.network.RegistryByteBuf;
-import net.minecraft.network.codec.PacketCodec;
 
 import java.util.*;
 
 public class StickerPackCollection extends ArrayList<String> {
-
-    public static final PacketCodec<RegistryByteBuf, StickerPackCollection> OPTIONAL_PACKET_CODEC = new PacketCodec<>(){
-        public StickerPackCollection decode(RegistryByteBuf buf) {
-            var collection = new StickerPackCollection();
-            int size = buf.readVarInt();
-            for (int i = 0; i < size; i++) {
-                collection.add(buf.readString());
-            }
-            return collection;
-        }
-
-        public void encode(RegistryByteBuf buf, StickerPackCollection collection) {
-            buf.writeVarInt(collection.size());
-            for (var sticker : collection) {
-                buf.writeString(sticker);
-            }
-        }
-    };
-
     public NbtElement toNbt() {
         var list = new NbtList();
         for (var sticker : this) {
