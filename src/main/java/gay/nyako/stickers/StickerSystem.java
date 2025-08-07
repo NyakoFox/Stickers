@@ -22,22 +22,16 @@ public class StickerSystem {
     public static void render(DrawContext drawContext, float tickDelta) {
         int y = drawContext.getScaledWindowHeight() / 2 - (STICKERS.size() * (STICKER_HEIGHT + STICKER_PADDING)) / 2;
 
-        Iterator<StickerDisplay> iterator = STICKERS.iterator();
-        while (iterator.hasNext()) {
+        for (StickerDisplay stickerDisplay : STICKERS) {
             int x = drawContext.getScaledWindowWidth() - STICKER_WIDTH - STICKER_PADDING;
 
-            StickerDisplay sticker = iterator.next();
-            sticker.tickDelta = tickDelta;
-
-            if (sticker.ticks > StickersMod.CONFIG.stickerTimer() - 10)
-            {
+            if (stickerDisplay.ticks > StickersMod.CONFIG.stickerTimer() - 10) {
                 x = drawContext.getScaledWindowWidth();
             }
 
-            sticker.targetX = x;
-            sticker.targetY = y;
+            stickerDisplay.setTarget(x, y);
 
-            sticker.render(drawContext);
+            stickerDisplay.render(drawContext, tickDelta);
 
             y += STICKER_HEIGHT + STICKER_PADDING;
         }
@@ -48,14 +42,7 @@ public class StickerSystem {
             MinecraftClient.getInstance().player.playSound(StickerSoundEvents.STICKER, 1f, 1f);
         }
 
-        StickerDisplay sticker = new StickerDisplay();
-        sticker.playerName = player;
-        sticker.stickerData = stickerData;
-        sticker.playerUUID = playerUUID;
-        sticker.tickDelta = 0;
-        sticker.ticks = 0;
-        sticker.currentX = -1;
-        sticker.currentY = -1;
+        StickerDisplay sticker = new StickerDisplay(player, stickerData, playerUUID);
 
         STICKERS.add(sticker);
     }

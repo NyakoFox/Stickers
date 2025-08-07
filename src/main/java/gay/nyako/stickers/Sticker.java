@@ -7,10 +7,14 @@ public class Sticker {
     public String title;
     public transient byte[] image;
     public transient Identifier identifier;
+    public float width;
+    public float height;
 
     public Sticker(String filename, String title) {
         this.filename = filename;
         this.title = title;
+        this.width = StickerSystem.STICKER_WIDTH;
+        this.height = StickerSystem.STICKER_HEIGHT;
     }
 
     public void setImage(byte[] image) {

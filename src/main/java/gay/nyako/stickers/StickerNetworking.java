@@ -26,7 +26,8 @@ public class StickerNetworking {
                 (payload, context) -> {
                     context.player().server.execute(() -> {
                         context.player().server.getPlayerManager().getPlayerList().forEach((serverPlayerEntity) -> {
-                            ServerPlayNetworking.send(serverPlayerEntity, new SendStickerToClientPayload(payload.pack(), payload.string(), context.player().getGameProfile()));
+                            Text name = serverPlayerEntity.getDisplayName();
+                            ServerPlayNetworking.send(serverPlayerEntity, new SendStickerToClientPayload(payload.pack(), payload.name(), context.player().getGameProfile(), name));
                         });
                     });
                 }
@@ -44,7 +45,7 @@ public class StickerNetworking {
                         }
                         Sticker stickerData = null;
                         for (Sticker sticker : pack.stickers) {
-                            if (sticker.filename.equals(payload.string())) {
+                            if (sticker.filename.equals(payload.sticker())) {
                                 stickerData = sticker;
                                 break;
                             }
@@ -52,7 +53,17 @@ public class StickerNetworking {
                         if (stickerData == null) {
                             return;
                         }
-                        StickerSystem.addSticker(Text.of(payload.gameProfile().getName()), stickerData, payload.gameProfile().getId());
+
+                        Text playerName = payload.playerName();
+                        if (playerName == null) {
+                             playerName = Text.of(payload.gameProfile().getName());
+                        }
+
+                        if (playerName == null) {
+                            playerName = Text.empty();
+                        }
+
+                        StickerSystem.addSticker(playerName, stickerData, payload.gameProfile().getId());
                     });
                 }
         );

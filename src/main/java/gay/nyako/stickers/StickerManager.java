@@ -117,12 +117,14 @@ public class StickerManager {
         StickersMod.LOGGER.info("Added sticker " + payload.name() + " to pack " + payload.pack());
         // let's also register this as a NativeImage
         try {
-            NativeImageBackedTexture nativeImageBackedTexture = new NativeImageBackedTexture(NativeImage.read(null, new ByteArrayInputStream(payload.image())));
+            NativeImage nativeImage = NativeImage.read(null, new ByteArrayInputStream(payload.image()));
+            sticker.width = nativeImage.getWidth();
+            sticker.height = nativeImage.getHeight();
+            NativeImageBackedTexture nativeImageBackedTexture = new NativeImageBackedTexture(nativeImage);
             MinecraftClient.getInstance().getTextureManager().registerTexture(sticker.identifier, nativeImageBackedTexture);
         } catch (Exception e) {
             StickersMod.LOGGER.warn("Failed to load image from byte array");
             e.printStackTrace();
-            return;
         }
     }
 }
