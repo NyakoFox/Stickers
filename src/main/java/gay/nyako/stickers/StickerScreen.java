@@ -1,7 +1,6 @@
 package gay.nyako.stickers;
 
 import com.google.common.collect.Lists;
-import gay.nyako.stickers.access.PlayerEntityAccess;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
@@ -12,8 +11,6 @@ import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -30,8 +27,6 @@ public class StickerScreen extends Screen {
     private List<StickerGroupWidget> orderedStickerPacks = Lists.newArrayList();
     private final HashMap<String, StickerGroupWidget> stickerPacks = new HashMap<>();
     private final List<StickerWidget> stickers = Lists.newArrayList();
-
-    private static final String DEFAULT_PACK_KEY = "default";
 
     public StickerScreen() {
         super(Text.translatable("stickers.title"));
@@ -50,9 +45,7 @@ public class StickerScreen extends Screen {
 
         orderedStickerPacks = new ArrayList<>(stickerPacks.values());
         orderedStickerPacks.sort((a, b) -> a == b ? 0 :
-            a.data.key.equals(DEFAULT_PACK_KEY) ? -4000 :
-                    b.data.key.equals(DEFAULT_PACK_KEY) ? 4000:
-                            a.data.name.compareTo(b.data.name));
+            a.data.name.compareTo(b.data.name));
 
         readjustComponents();
 
@@ -64,7 +57,7 @@ public class StickerScreen extends Screen {
     }
 
     private void addStickerPack(String key, StickerPack value) {
-        if (((PlayerEntityAccess)MinecraftClient.getInstance().player).getStickerPackCollection().hasStickerPack(key))
+        if (MinecraftClient.getInstance().player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION).hasStickerPack(key))
         {
             for (var sticker : value.stickers) {
                 addSticker(key, sticker);

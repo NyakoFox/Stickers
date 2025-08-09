@@ -33,7 +33,7 @@ public class StickersMod implements ModInitializer {
 		StickerSoundEvents.register();
 		StickerNetworking.registerReceivers();
 
-		TrackedDataHandlerRegistry.register(TrackedDataHandlers.STICKER_PACK_COLLECTION_DATA);
+		StickerAttachmentTypes.register();
 
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
 			StickerPackCommand.register(dispatcher);
@@ -44,13 +44,25 @@ public class StickersMod implements ModInitializer {
 		});
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			// for key, value
+			// Send the player the list of their sticker packs
+			StickerPackCollection collection = handler.player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
+			for (String stickerPackKey : collection.stickerPacks()) {
+				if (ServerPlayNetworking.canSend(handler.player, AddStickerPackPayload.ID)) {
+					ServerPlayNetworking.send(handler.player, new AddStickerPackPayload(stickerPackKey));
+				}
+			}
+
+			// Send all sticker pack data, and all stickers for those packs
 			for (String stickerPackKey : STICKER_MANAGER.stickerPacks.keySet()) {
 				StickerPack stickerPack = STICKER_MANAGER.stickerPacks.get(stickerPackKey);
-				ServerPlayNetworking.send(handler.player, new SendStickerPackDataPayload(stickerPackKey, stickerPack.name));
-				stickerPack.stickers.forEach(sticker -> {
-					ServerPlayNetworking.send(handler.player, new SendStickerDataPayload(stickerPackKey, sticker.filename, sticker.title, sticker.image));
-				});
+				if (ServerPlayNetworking.canSend(handler.player, SendStickerPackDataPayload.ID)) {
+					ServerPlayNetworking.send(handler.player, new SendStickerPackDataPayload(stickerPackKey, stickerPack.name));
+					if (ServerPlayNetworking.canSend(handler.player, SendStickerDataPayload.ID)) {
+						stickerPack.stickers.forEach(sticker -> {
+							ServerPlayNetworking.send(handler.player, new SendStickerDataPayload(stickerPackKey, sticker.filename, sticker.title, sticker.image));
+						});
+					}
+				}
 			}
 		});
 	}

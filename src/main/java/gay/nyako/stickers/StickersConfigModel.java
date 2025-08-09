@@ -12,7 +12,7 @@ import java.util.List;
 @Config(name = "stickers", wrapperName = "StickersConfig")
 public class StickersConfigModel {
     @Sync(Option.SyncMode.OVERRIDE_CLIENT)
-    public List<String> defaultPacks = List.of("default");
+    public List<String> defaultPacks = List.of("minecraft");
     public boolean playStickerSound = true;
     @RangeConstraint(min = 20, max = 150)
     public int stickerTimer = 100;

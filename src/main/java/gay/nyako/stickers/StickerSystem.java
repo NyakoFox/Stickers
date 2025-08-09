@@ -66,6 +66,8 @@ public class StickerSystem {
 
     public static void showSticker(String pack, Sticker data) {
         stickerDelay = StickersMod.CONFIG.stickerUsageDelay();
-        ClientPlayNetworking.send(new SendStickerPayload(pack, data.filename));
+        if (ClientPlayNetworking.canSend(SendStickerPayload.ID)) {
+            ClientPlayNetworking.send(new SendStickerPayload(pack, data.filename));
+        }
     }
 }

@@ -2,10 +2,7 @@
   "required": true,
   "package": "gay.nyako.stickers.mixin",
   "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "PlayerEntityMixin",
-    "ServerPlayerEntityMixin"
-  ],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
 	}

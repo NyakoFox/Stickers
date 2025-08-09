@@ -1,6 +1,5 @@
 package gay.nyako.stickers;
 
-import gay.nyako.stickers.access.PlayerEntityAccess;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -27,7 +26,9 @@ public class StickerNetworking {
                     context.player().server.execute(() -> {
                         context.player().server.getPlayerManager().getPlayerList().forEach((serverPlayerEntity) -> {
                             Text name = serverPlayerEntity.getDisplayName();
-                            ServerPlayNetworking.send(serverPlayerEntity, new SendStickerToClientPayload(payload.pack(), payload.name(), context.player().getGameProfile(), name));
+                            if (ServerPlayNetworking.canSend(serverPlayerEntity, SendStickerToClientPayload.ID)) {
+                                ServerPlayNetworking.send(serverPlayerEntity, new SendStickerToClientPayload(payload.pack(), payload.name(), context.player().getGameProfile(), name));
+                            }
                         });
                     });
                 }
@@ -70,18 +71,18 @@ public class StickerNetworking {
         ClientPlayNetworking.registerGlobalReceiver(AddStickerPackPayload.ID,
                 (payload, context) -> {
                     context.client().execute(() -> {
-                        var collection = ((PlayerEntityAccess) context.client().player).getStickerPackCollection();
-                        collection.addStickerPack(payload.string());
-                        ((PlayerEntityAccess) context.client().player).setStickerPackCollection(collection);
+                        var player = context.client().player;
+                        var collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
+                        player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.addStickerPack(payload.string()));
                     });
                 }
         );
         ClientPlayNetworking.registerGlobalReceiver(RemoveStickerPackPayload.ID,
                 (payload, context) -> {
                     context.client().execute(() -> {
-                        var collection = ((PlayerEntityAccess) context.client().player).getStickerPackCollection();
-                        collection.removeStickerPack(payload.string());
-                        ((PlayerEntityAccess) context.client().player).setStickerPackCollection(collection);
+                        var player = context.client().player;
+                        var collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
+                        player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.removeStickerPack(payload.string()));
                     });
                 }
         );

@@ -4,11 +4,8 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import gay.nyako.stickers.access.PlayerEntityAccess;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.command.argument.GameProfileArgumentType;
-import net.minecraft.command.suggestion.SuggestionProviders;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -29,8 +26,8 @@ public class StickerPackCommand {
                                 ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(profile.getId());
                                 if (player != null) {
                                     context.getSource().sendFeedback(() -> Text.of("Player " + profile.getName() + " has the following sticker packs:"), false);
-                                    StickerPackCollection collection = ((PlayerEntityAccess) player).getStickerPackCollection();
-                                    collection.getStickerPacks().forEach(stickerPack -> {
+                                    StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
+                                    collection.stickerPacks().forEach(stickerPack -> {
                                         context.getSource().sendFeedback(() -> Text.of(stickerPack), false);
                                     });
                                 }
@@ -51,10 +48,11 @@ public class StickerPackCommand {
                                             profiles.forEach(profile -> {
                                                 ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(profile.getId());
                                                 if (player != null) {
-                                                    StickerPackCollection collection = ((PlayerEntityAccess) player).getStickerPackCollection();
-                                                    collection.addStickerPack(stickerPack);
-                                                    ((PlayerEntityAccess) player).setStickerPackCollection(collection);
-                                                    ServerPlayNetworking.send(player, new AddStickerPackPayload(stickerPack));
+                                                    StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
+                                                    player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.addStickerPack(stickerPack));
+                                                    if (ServerPlayNetworking.canSend(player, AddStickerPackPayload.ID)) {
+                                                        ServerPlayNetworking.send(player, new AddStickerPackPayload(stickerPack));
+                                                    }
                                                     context.getSource().sendFeedback(() -> Text.of("Added sticker pack to " + profile.getName()), false);
                                                 }
                                                 else
@@ -76,10 +74,11 @@ public class StickerPackCommand {
                                             profiles.forEach(profile -> {
                                                 ServerPlayerEntity player = context.getSource().getServer().getPlayerManager().getPlayer(profile.getId());
                                                 if (player != null) {
-                                                    StickerPackCollection collection = ((PlayerEntityAccess) player).getStickerPackCollection();
-                                                    collection.removeStickerPack(stickerPack);
-                                                    ((PlayerEntityAccess) player).setStickerPackCollection(collection);
-                                                    ServerPlayNetworking.send(player, new RemoveStickerPackPayload(stickerPack));
+                                                    StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
+                                                    player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.removeStickerPack(stickerPack));
+                                                    if (ServerPlayNetworking.canSend(player, RemoveStickerPackPayload.ID)) {
+                                                        ServerPlayNetworking.send(player, new RemoveStickerPackPayload(stickerPack));
+                                                    }
                                                     context.getSource().sendFeedback(() -> Text.of("Removed sticker pack from " + profile.getName()), false);
                                                 }
                                                 else
