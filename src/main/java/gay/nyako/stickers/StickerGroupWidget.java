@@ -41,7 +41,7 @@ public class StickerGroupWidget extends PressableWidget {
     }
 
     @Override
-    public void renderButton(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         if (isHovered())
         {
             context.setShaderColor(1.0f, 1.0f, 1.0f, this.alpha);

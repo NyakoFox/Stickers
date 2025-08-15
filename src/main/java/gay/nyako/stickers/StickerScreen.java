@@ -212,7 +212,7 @@ public class StickerScreen extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        renderBackground(context);
+        renderBackground(context, mouseX, mouseY, delta);
         super.render(context, mouseX, mouseY, delta);
 
         float scroller = 0;
@@ -231,19 +231,19 @@ public class StickerScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(DrawContext context) {
+    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
         context.fill(0, 0, this.width, this.height, 0x88000000);
         context.fill(0, 0, this.SIDEBAR_WIDTH - 16, this.height, 0x88000000);
         context.fill(0, 0, this.SIDEBAR_WIDTH - 16, 48, 0x88000000);
     }
 
     @Override
-    public boolean mouseScrolled(double mouseX, double mouseY, double amount) {
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
         if (mouseX < SIDEBAR_WIDTH) {
-            scrollPacks += (int) (amount * 20);
+            scrollPacks += (int) (verticalAmount * 20);
             readjustPacks();
         } else {
-            scrollStickers += (int) (amount * 16);
+            scrollStickers += (int) (verticalAmount * 16);
             readjustStickers();
         }
 
