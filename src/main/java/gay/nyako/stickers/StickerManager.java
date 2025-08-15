@@ -63,8 +63,7 @@ public class StickerManager {
                 }
 
                 StickerPack pack = gson.fromJson(reader, StickerPack.class);
-                pack.key = directory.getName();
-                pack.loadStickers();
+                pack.loadStickers(directory.getName());
                 stickerPacks.put(directory.getName(), pack);
             }
             // else if zip
@@ -79,9 +78,8 @@ public class StickerManager {
                             StickersMod.LOGGER.info("Loading sticker pack with ID " + key + " (from zip)");
                             JsonReader reader = new JsonReader(new InputStreamReader(zipFile.getInputStream(entry)));
                             StickerPack pack = gson.fromJson(reader, StickerPack.class);
-                            pack.key = key;
-                            pack.loadStickersFromZip(entries, zipFile);
-                            stickerPacks.put(pack.key, pack);
+                            pack.loadStickersFromZip(key, entries, zipFile);
+                            stickerPacks.put(pack.getKey(), pack);
                         }
                     }
                     if (!foundPackJson) {
@@ -95,9 +93,9 @@ public class StickerManager {
     }
 
     public void addStickerPackFromDataPayload(SendStickerPackDataPayload payload) {
-        StickerPack pack = new StickerPack(payload.name(), new ArrayList<>());
-        pack.key = payload.pack();
-        stickerPacks.put(payload.pack(), pack);
+        String key = payload.pack();
+        StickerPack pack = new StickerPack(key, payload.name(), new ArrayList<>());
+        stickerPacks.put(key, pack);
     }
 
     @Environment(EnvType.CLIENT)

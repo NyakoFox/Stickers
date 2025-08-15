@@ -56,9 +56,9 @@ public class StickersMod implements ModInitializer {
 			for (String stickerPackKey : STICKER_MANAGER.stickerPacks.keySet()) {
 				StickerPack stickerPack = STICKER_MANAGER.stickerPacks.get(stickerPackKey);
 				if (ServerPlayNetworking.canSend(handler.player, SendStickerPackDataPayload.ID)) {
-					ServerPlayNetworking.send(handler.player, new SendStickerPackDataPayload(stickerPackKey, stickerPack.name));
+					ServerPlayNetworking.send(handler.player, new SendStickerPackDataPayload(stickerPackKey, stickerPack.getName()));
 					if (ServerPlayNetworking.canSend(handler.player, SendStickerDataPayload.ID)) {
-						stickerPack.stickers.forEach(sticker -> {
+						stickerPack.getStickers().forEach(sticker -> {
 							ServerPlayNetworking.send(handler.player, new SendStickerDataPayload(stickerPackKey, sticker.filename, sticker.title, sticker.image));
 						});
 					}
