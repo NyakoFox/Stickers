@@ -54,7 +54,7 @@ public class StickerNetworking {
                             return;
                         }
                         Sticker stickerData = null;
-                        for (Sticker sticker : stickerPack.stickers) {
+                        for (Sticker sticker : stickerPack.getStickers()) {
                             if (sticker.filename.equals(stickerName)) {
                                 stickerData = sticker;
                                 break;

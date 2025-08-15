@@ -19,7 +19,7 @@ public class StickerGroupWidget extends PressableWidget {
     private boolean selected = false;
 
     public StickerGroupWidget(int x, int y, StickerPack pack) {
-        super(x, y, 96, 16, Text.of(pack == null ? "All" : pack.name));
+        super(x, y, 96, 16, Text.of(pack == null ? "All" : pack.getName()));
         this.data = pack;
     }
 
@@ -52,7 +52,7 @@ public class StickerGroupWidget extends PressableWidget {
             context.setShaderColor(0.8f, 0.8f, 0.8f, this.alpha);
         }
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        var text = (MutableText) Text.of(data.name);
+        var text = (MutableText) Text.of(data.getName());
         if (selected) {
             text = text.setStyle(Style.EMPTY.withUnderline(true));
         }

@@ -51,9 +51,9 @@ public class StickersMod implements ModInitializer {
 				StickerPack stickerPack = STICKER_MANAGER.stickerPacks.get(stickerPackKey);
 				PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
 				buf.writeString(stickerPackKey);
-				buf.writeString(stickerPack.name);
+				buf.writeString(stickerPack.getName());
 				ServerPlayNetworking.send(handler.player, StickerNetworking.SEND_STICKER_PACK_DATA, buf);
-				stickerPack.stickers.forEach(sticker -> {
+				stickerPack.getStickers().forEach(sticker -> {
 					PacketByteBuf stickerBuf = new PacketByteBuf(Unpooled.buffer());
 					stickerBuf.writeString(stickerPackKey);
 					stickerBuf.writeString(sticker.filename);
