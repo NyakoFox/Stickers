@@ -50,9 +50,9 @@ public class StickerScreen extends Screen {
 
         orderedStickerPacks = new ArrayList<>(stickerPacks.values());
         orderedStickerPacks.sort((a, b) -> a == b ? 0 :
-            a.data.key.equals(DEFAULT_PACK_KEY) ? -4000 :
-                    b.data.key.equals(DEFAULT_PACK_KEY) ? 4000:
-                            a.data.name.compareTo(b.data.name));
+            a.data.getKey().equals(DEFAULT_PACK_KEY) ? -4000 :
+                    b.data.getKey().equals(DEFAULT_PACK_KEY) ? 4000:
+                            a.data.getName().compareTo(b.data.getName()));
 
         readjustComponents();
 
@@ -66,7 +66,7 @@ public class StickerScreen extends Screen {
     private void addStickerPack(String key, StickerPack value) {
         if (((PlayerEntityAccess)MinecraftClient.getInstance().player).getStickerPackCollection().hasStickerPack(key))
         {
-            for (var sticker : value.stickers) {
+            for (var sticker : value.getStickers()) {
                 addSticker(key, sticker);
             }
         }
@@ -96,7 +96,7 @@ public class StickerScreen extends Screen {
                     Text.translatable(
                             "stickers.stickers.sticker_tooltip",
                             ((MutableText) Text.of(stickerData.title)).formatted(Formatting.AQUA),
-                            ((MutableText) Text.of(pack.data.name)).formatted(Formatting.WHITE)
+                            ((MutableText) Text.of(pack.data.getName())).formatted(Formatting.WHITE)
                     ).formatted(Formatting.GRAY)
             ));
             this.addDrawableChild(button);

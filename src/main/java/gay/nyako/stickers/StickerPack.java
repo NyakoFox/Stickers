@@ -11,17 +11,32 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class StickerPack {
-    String name;
-    transient String key;
-    List<Sticker> stickers;
+    private String name;
+    private transient String key;
+    private List<Sticker> stickers;
 
-    public StickerPack(String name, List<Sticker> stickers) {
+    public StickerPack(String key, String name, List<Sticker> stickers) {
+        this.key = key;
         this.name = name;
         this.stickers = stickers;
     }
 
-    public void loadStickers() {
+    public String getName() {
+        return name;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public List<Sticker> getStickers() {
+        return stickers;
+    }
+
+    public void loadStickers(String key) {
         // Load stickers from the directory as byte arrays
+
+        this.key = key;
 
         for (Sticker sticker : stickers) {
             // Load the sticker
@@ -50,7 +65,8 @@ public class StickerPack {
         stickers.add(sticker);
     }
 
-    public void loadStickersFromZip(ArrayList<? extends ZipEntry> entries, ZipFile zipFile) {
+    public void loadStickersFromZip(String key, ArrayList<? extends ZipEntry> entries, ZipFile zipFile) {
+        this.key = key;
         for (Sticker sticker : stickers) {
             for (ZipEntry entry : entries) {
                 if (entry.getName().equals(sticker.filename + ".png")) {
