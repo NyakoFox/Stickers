@@ -7,11 +7,15 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.Drawable;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
+import net.minecraft.client.gui.widget.MultilineTextWidget;
+import net.minecraft.client.gui.widget.TextWidget;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 
+import java.text.Format;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -51,6 +55,18 @@ public class StickerScreen extends Screen {
 
         if (!orderedStickerPacks.isEmpty()) {
             loadStickerPack(orderedStickerPacks.getFirst());
+        }
+        else
+        {
+            var line1 = addDrawableChild(new TextWidget(Text.of("You have no sticker packs!"), this.textRenderer));
+            line1.setX((width / 2) - (line1.getWidth() / 2));
+            line1.setY((height / 2) - line1.getHeight() - 8);
+            line1.setTextColor(0xFFAAAAAA);
+
+            var line2 = addDrawableChild(new MultilineTextWidget(Text.of("Either your sticker pack collection is empty,\nor the server does not support stickers."), this.textRenderer));
+            line2.setX((width / 2) - (line2.getWidth() / 2));
+            line2.setY((height / 2) + 8);
+            line2.setTextColor(0xFFAAAAAA);
         }
 
         super.init();
@@ -207,16 +223,16 @@ public class StickerScreen extends Screen {
     public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         super.render(context, mouseX, mouseY, delta);
 
-        float scroller = 0;
-
-        for (Drawable drawable : stickerPacks.values()) {
-            context.enableScissor(0, 32, SIDEBAR_WIDTH, this.height - 32);
-            drawable.render(context, mouseX, mouseY, delta);
-            context.disableScissor();
+        if (!orderedStickerPacks.isEmpty()) {
+            for (Drawable drawable : stickerPacks.values()) {
+                context.enableScissor(0, 32, SIDEBAR_WIDTH, this.height - 32);
+                drawable.render(context, mouseX, mouseY, delta);
+                context.disableScissor();
+            }
+            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
+            var label = Text.literal("Sticker Packs").setStyle(Style.EMPTY.withUnderline(true));
+            context.drawText(textRenderer, label, 28, 20, 0xFFFFFFFF, true);
         }
-        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        var label = Text.literal("Sticker Packs").setStyle(Style.EMPTY.withUnderline(true));
-        context.drawText(textRenderer, label, 28, 20, 0xFFFFFFFF, true);
 
         this.mouseX = mouseX;
         this.mouseY = mouseY;
@@ -225,8 +241,11 @@ public class StickerScreen extends Screen {
     @Override
     public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
         context.fill(0, 0, this.width, this.height, 0x88000000);
-        context.fill(0, 0, this.SIDEBAR_WIDTH - 16, this.height, 0x88000000);
-        context.fill(0, 0, this.SIDEBAR_WIDTH - 16, 48, 0x88000000);
+
+        if (!orderedStickerPacks.isEmpty()) {
+            context.fill(0, 0, this.SIDEBAR_WIDTH - 16, this.height, 0x88000000);
+            context.fill(0, 0, this.SIDEBAR_WIDTH - 16, 48, 0x88000000);
+        }
     }
 
     @Override

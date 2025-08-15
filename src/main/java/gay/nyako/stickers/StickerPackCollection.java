@@ -1,14 +1,7 @@
 package gay.nyako.stickers;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.network.codec.PacketCodec;
 
 import java.util.*;
 
@@ -20,11 +13,10 @@ public record StickerPackCollection(List<String> stickerPacks) {
     );
 
     public StickerPackCollection() {
-        this(List.of());
+        this(List.copyOf(StickersMod.CONFIG.defaultPacks()));
     }
 
     public boolean hasStickerPack(String sticker) {
-        if (StickersMod.CONFIG.defaultPacks().contains(sticker)) return true;
         return stickerPacks.contains(sticker);
     }
 
