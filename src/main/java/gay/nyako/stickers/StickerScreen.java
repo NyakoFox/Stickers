@@ -57,7 +57,7 @@ public class StickerScreen extends Screen {
         readjustComponents();
 
         if (!orderedStickerPacks.isEmpty()) {
-            loadStickerPack(orderedStickerPacks.getFirst());
+            loadStickerPack(orderedStickerPacks.get(0));
         }
 
         super.init();
