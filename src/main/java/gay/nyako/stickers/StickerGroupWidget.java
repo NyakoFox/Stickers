@@ -8,6 +8,7 @@ import net.minecraft.client.gui.widget.PressableWidget;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.ColorHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,21 +45,16 @@ public class StickerGroupWidget extends PressableWidget {
     public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         if (isHovered())
         {
-            context.setShaderColor(1.0f, 1.0f, 1.0f, this.alpha);
-            context.drawBorder(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, 0xFFFFFFFF);
+            context.drawBorder(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, ColorHelper.getWhite(1));
         }
-        else
-        {
-            context.setShaderColor(0.8f, 0.8f, 0.8f, this.alpha);
-        }
+
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         var text = (MutableText) Text.of(data.getName());
         if (selected) {
             text = text.setStyle(Style.EMPTY.withUnderline(true));
         }
-        context.drawText(textRenderer, text, this.getX() + 4, this.getY() + 4, 0xFFFFFFFF, true);
-        // context.drawTexture(texture, this.getX(), this.getY(), 0, 0, this.width, this.height, this.width, this.height);
-        context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+
+        context.drawText(textRenderer, text, this.getX() + 4, this.getY() + 4, ColorHelper.getWhite(isHovered() ? 1f : 0.6f), true);
     }
 
     public void clearStickers() {

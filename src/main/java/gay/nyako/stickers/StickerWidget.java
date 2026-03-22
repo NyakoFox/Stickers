@@ -4,8 +4,10 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.PressableWidget;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
 
 public class StickerWidget extends PressableWidget {
     public final Sticker data;
@@ -38,12 +40,7 @@ public class StickerWidget extends PressableWidget {
     public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         if (isHovered())
         {
-            context.setShaderColor(1.0f, 1.0f, 1.0f, this.alpha);
             context.drawBorder(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, 0xFFFFFFFF);
-        }
-        else
-        {
-            context.setShaderColor(0.8f, 0.8f, 0.8f, this.alpha);
         }
 
         float aspectRatio = data.width / data.height;
@@ -62,7 +59,6 @@ public class StickerWidget extends PressableWidget {
         int drawX = (int) (this.getX() + (StickerSystem.STICKER_WIDTH - drawWidth) / 2f);
         int drawY = (int) (this.getY() + (StickerSystem.STICKER_HEIGHT - drawHeight) / 2f);
 
-        context.drawTexture(this.data.identifier, drawX, drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight);
-        context.setShaderColor(1.0f, 1.0f, 1.0f, 1.0f);
+        context.drawTexture(RenderLayer::getGuiTextured, this.data.identifier, drawX, drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ColorHelper.getWhite(this.alpha * (isHovered() ? 1f : 0.8f)));
     }
 }

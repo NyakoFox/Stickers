@@ -3,7 +3,9 @@ package gay.nyako.stickers;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.UUID;
@@ -87,10 +89,8 @@ public class StickerDisplay {
         float drawX = currentX + (StickerSystem.STICKER_WIDTH - drawWidth) / 2f;
         float drawY = currentY + (StickerSystem.STICKER_HEIGHT - drawHeight) / 2f;
 
-        drawContext.setShaderColor(0, 0, 0, 0.5f);
-        drawContext.drawTexture(stickerData.identifier, (int) drawX + 1, (int) drawY + 1, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight);
-        drawContext.setShaderColor(1, 1, 1, 1);
-        drawContext.drawTexture(stickerData.identifier, (int) drawX, (int) drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight);
+        drawContext.drawTexture(RenderLayer::getGuiTextured, stickerData.identifier, (int) drawX + 1, (int) drawY + 1, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ColorHelper.fromFloats(0, 0, 0, 0.5f));
+        drawContext.drawTexture(RenderLayer::getGuiTextured, stickerData.identifier, (int) drawX, (int) drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ColorHelper.getWhite(1));
 
         if (playerName != null) {
             TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
