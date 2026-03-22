@@ -43,7 +43,7 @@ public class StickerGroupWidget extends PressableWidget {
     }
 
     @Override
-    public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void drawIcon(DrawContext context, int mouseX, int mouseY, float delta) {
         if (isHovered())
         {
             context.drawStrokedRectangle(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, ColorHelper.getWhite(1));

@@ -9,10 +9,7 @@ import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.tooltip.Tooltip;
 import net.minecraft.client.gui.widget.MultilineTextWidget;
 import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
+import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 
 import java.text.Format;
@@ -57,15 +54,13 @@ public class StickerScreen extends Screen {
         }
         else
         {
-            var line1 = addDrawableChild(new TextWidget(Text.of("You have no sticker packs!"), this.textRenderer));
+            var line1 = addDrawableChild(new TextWidget(Text.literal("You have no sticker packs!").setStyle(Style.EMPTY.withColor(0xFFAAAAAA)), this.textRenderer));
             line1.setX((width / 2) - (line1.getWidth() / 2));
             line1.setY((height / 2) - line1.getHeight() - 8);
-            line1.setTextColor(0xFFAAAAAA);
 
-            var line2 = addDrawableChild(new MultilineTextWidget(Text.of("Either your sticker pack collection is empty,\nor the server does not support stickers."), this.textRenderer));
+            var line2 = addDrawableChild(new MultilineTextWidget(Text.literal("Either your sticker pack collection is empty,\nor the server does not support stickers.").setStyle(Style.EMPTY.withColor(0xFFAAAAAA)), this.textRenderer));
             line2.setX((width / 2) - (line2.getWidth() / 2));
             line2.setY((height / 2) + 8);
-            line2.setTextColor(0xFFAAAAAA);
         }
 
         super.init();
@@ -78,11 +73,6 @@ public class StickerScreen extends Screen {
                 addSticker(key, sticker);
             }
         }
-    }
-
-    @Override
-    public void resize(MinecraftClient client, int width, int height) {
-        super.resize(client, width, height);
     }
 
     public void loadStickerPack(StickerGroupWidget pack) {
