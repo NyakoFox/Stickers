@@ -19,7 +19,7 @@ public class StickersMod implements ModInitializer {
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("Stickers");
 
-	public static final SuggestionProvider<ServerCommandSource> STICKER_PACK_SUGGESTION_PROVIDER = SuggestionProviders.register(new Identifier("stickers", "sticker_pack_suggestions"), (context, builder) -> {
+	public static final SuggestionProvider<ServerCommandSource> STICKER_PACK_SUGGESTION_PROVIDER = SuggestionProviders.register(Identifier.of("stickers", "sticker_pack_suggestions"), (context, builder) -> {
 		STICKER_MANAGER.stickerPacks.forEach((key, stickerPack) -> {
 			builder.suggest(key);
 		});

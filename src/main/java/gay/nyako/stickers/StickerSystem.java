@@ -3,6 +3,7 @@ package gay.nyako.stickers;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.text.Text;
 
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class StickerSystem {
 
     public static int stickerDelay = 0;
 
-    public static void render(DrawContext drawContext, float tickDelta) {
+    public static void render(DrawContext drawContext, RenderTickCounter renderTickCounter) {
         int y = drawContext.getScaledWindowHeight() / 2 - (STICKERS.size() * (STICKER_HEIGHT + STICKER_PADDING)) / 2;
 
         for (StickerDisplay stickerDisplay : STICKERS) {
@@ -31,7 +32,7 @@ public class StickerSystem {
 
             stickerDisplay.setTarget(x, y);
 
-            stickerDisplay.render(drawContext, tickDelta);
+            stickerDisplay.render(drawContext, renderTickCounter.getTickDelta(true));
 
             y += STICKER_HEIGHT + STICKER_PADDING;
         }

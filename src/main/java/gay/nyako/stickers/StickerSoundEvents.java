@@ -9,7 +9,7 @@ public class StickerSoundEvents {
     public static final SoundEvent STICKER = register("sticker");
 
     public static SoundEvent register(String name) {
-        Identifier identifier = new Identifier("stickers", name);
+        Identifier identifier = Identifier.of("stickers", name);
         return Registry.register(Registries.SOUND_EVENT, identifier, SoundEvent.of(identifier));
     }
 

@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.6-SNAPSHOT'
+	id 'fabric-loom' version "${loom_version}"
 	id 'maven-publish'
 }
 
@@ -21,7 +21,7 @@ dependencies {
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
-	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
 	annotationProcessor modImplementation("io.wispforest:owo-lib:${project.owo_version}")
 	include "io.wispforest:owo-sentinel:${project.owo_version}"
@@ -30,10 +30,14 @@ dependencies {
 }
 
 processResources {
-	inputs.property "version", project.version
+	inputs.properties([
+		"version": project.version,
+		"loader_version": project.loader_version,
+		"minecraft_minimum_version": project.minecraft_minimum_version
+	])
 
 	filesMatching("fabric.mod.json") {
-		expand "version": project.version
+		expand inputs.properties
 	}
 }
 

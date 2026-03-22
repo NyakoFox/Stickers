@@ -4,9 +4,10 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.codec.PacketCodec;
 import net.minecraft.network.codec.PacketCodecs;
 import net.minecraft.network.packet.CustomPayload;
+import net.minecraft.util.Identifier;
 
 public record SendStickerPackDataPayload(String pack, String name) implements CustomPayload {
-    public static final Id<SendStickerPackDataPayload> ID = CustomPayload.id("stickers:send_sticker_pack_data");
+    public static final Id<SendStickerPackDataPayload> ID = new Id<>(Identifier.of("stickers", "send_sticker_pack_data"));
     public static final PacketCodec<PacketByteBuf, SendStickerPackDataPayload> CODEC = PacketCodec.tuple(
             PacketCodecs.STRING,
             SendStickerPackDataPayload::pack,

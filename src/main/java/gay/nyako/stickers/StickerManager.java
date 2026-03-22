@@ -108,7 +108,7 @@ public class StickerManager {
 
         Sticker sticker = new Sticker(payload.filepath(), payload.name());
         sticker.setImage(payload.image());
-        sticker.setIdentifier(new Identifier("stickers", payload.pack() + "/" + payload.filepath()));
+        sticker.setIdentifier(Identifier.of("stickers", payload.pack() + "/" + payload.filepath()));
 
         pack.addSticker(sticker);
 
