@@ -1,6 +1,7 @@
 package gay.nyako.stickers;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gl.RenderPipelines;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.PressableWidget;
@@ -59,6 +60,6 @@ public class StickerWidget extends PressableWidget {
         int drawX = (int) (this.getX() + (StickerSystem.STICKER_WIDTH - drawWidth) / 2f);
         int drawY = (int) (this.getY() + (StickerSystem.STICKER_HEIGHT - drawHeight) / 2f);
 
-        context.drawTexture(RenderLayer::getGuiTextured, this.data.identifier, drawX, drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ColorHelper.getWhite(this.alpha * (isHovered() ? 1f : 0.8f)));
+        context.drawTexture(RenderPipelines.GUI_TEXTURED, this.data.identifier, drawX, drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ColorHelper.getWhite(this.alpha * (isHovered() ? 1f : 0.8f)));
     }
 }

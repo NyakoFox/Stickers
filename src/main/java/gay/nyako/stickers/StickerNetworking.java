@@ -23,8 +23,8 @@ public class StickerNetworking {
 
         ServerPlayNetworking.registerGlobalReceiver(SendStickerPayload.ID,
                 (payload, context) -> {
-                    context.player().server.execute(() -> {
-                        context.player().server.getPlayerManager().getPlayerList().forEach((serverPlayerEntity) -> {
+                    context.player().getServer().execute(() -> {
+                        context.player().getServer().getPlayerManager().getPlayerList().forEach((serverPlayerEntity) -> {
                             Text name = serverPlayerEntity.getDisplayName();
                             if (ServerPlayNetworking.canSend(serverPlayerEntity, SendStickerToClientPayload.ID)) {
                                 ServerPlayNetworking.send(serverPlayerEntity, new SendStickerToClientPayload(payload.pack(), payload.name(), context.player().getGameProfile(), name));

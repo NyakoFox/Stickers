@@ -118,7 +118,7 @@ public class StickerManager {
             NativeImage nativeImage = NativeImage.read(null, new ByteArrayInputStream(payload.image()));
             sticker.width = nativeImage.getWidth();
             sticker.height = nativeImage.getHeight();
-            NativeImageBackedTexture nativeImageBackedTexture = new NativeImageBackedTexture(nativeImage);
+            NativeImageBackedTexture nativeImageBackedTexture = new NativeImageBackedTexture(() -> "Sticker " + sticker.identifier.toString(), nativeImage);
             MinecraftClient.getInstance().getTextureManager().registerTexture(sticker.identifier, nativeImageBackedTexture);
         } catch (Exception e) {
             StickersMod.LOGGER.warn("Failed to load image from byte array", e);

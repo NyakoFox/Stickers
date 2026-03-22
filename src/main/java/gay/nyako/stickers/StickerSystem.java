@@ -32,7 +32,7 @@ public class StickerSystem {
 
             stickerDisplay.setTarget(x, y);
 
-            stickerDisplay.render(drawContext, renderTickCounter.getTickDelta(true));
+            stickerDisplay.render(drawContext, renderTickCounter.getTickProgress(true));
 
             y += STICKER_HEIGHT + STICKER_PADDING;
         }
