@@ -5,6 +5,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.PressableWidget;
+import net.minecraft.client.input.AbstractInput;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Style;
 import net.minecraft.text.Text;
@@ -25,7 +26,7 @@ public class StickerGroupWidget extends PressableWidget {
     }
 
     @Override
-    public void onPress() {
+    public void onPress(AbstractInput input) {
         selected = true;
         try {
             var screen = (StickerScreen) MinecraftClient.getInstance().currentScreen;
@@ -45,7 +46,7 @@ public class StickerGroupWidget extends PressableWidget {
     public void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
         if (isHovered())
         {
-            context.drawBorder(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, ColorHelper.getWhite(1));
+            context.drawStrokedRectangle(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, ColorHelper.getWhite(1));
         }
 
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;

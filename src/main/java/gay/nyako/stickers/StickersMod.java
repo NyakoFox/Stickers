@@ -44,14 +44,6 @@ public class StickersMod implements ModInitializer {
 		});
 
 		ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-			// Send the player the list of their sticker packs
-			StickerPackCollection collection = handler.player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
-			for (String stickerPackKey : collection.stickerPacks()) {
-				if (ServerPlayNetworking.canSend(handler.player, AddStickerPackPayload.ID)) {
-					ServerPlayNetworking.send(handler.player, new AddStickerPackPayload(stickerPackKey));
-				}
-			}
-
 			// Send all sticker pack data, and all stickers for those packs
 			for (String stickerPackKey : STICKER_MANAGER.stickerPacks.keySet()) {
 				StickerPack stickerPack = STICKER_MANAGER.stickerPacks.get(stickerPackKey);

@@ -25,6 +25,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class StickersClientMod implements ClientModInitializer {
+    private static final KeyBinding.Category BIND_CATEGORY = KeyBinding.Category.create(Identifier.of("sticker", "binds"));
+    private static final KeyBinding STICKER_KEYBIND = new KeyBinding(
+            "key.stickers.sticker",
+            InputUtil.Type.KEYSYM,
+            InputUtil.GLFW_KEY_H,
+            BIND_CATEGORY
+    );
+
     @Override
     public void onInitializeClient() {
         StickerNetworking.registerReceiversClient();
@@ -33,15 +41,8 @@ public class StickersClientMod implements ClientModInitializer {
 
         HudElementRegistry.attachElementBefore(VanillaHudElements.CHAT, Identifier.of("stickers", "sticker_render"), StickerSystem::render);
 
-        KeyBinding stickerBind = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.stickers.sticker", // The translation key of the keybinding's name
-                InputUtil.Type.KEYSYM, // The type of the keybinding, KEYSYM for keyboard, MOUSE for mouse.
-                GLFW.GLFW_KEY_H, // The keycode of the key
-                "category.stickers.binds" // The translation key of the keybinding's category.
-        ));
-
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (stickerBind.wasPressed()) {
+            if (STICKER_KEYBIND.wasPressed()) {
                 client.setScreen(new StickerScreen());
             }
         });

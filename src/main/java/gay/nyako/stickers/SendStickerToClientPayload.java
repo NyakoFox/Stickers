@@ -10,7 +10,7 @@ import net.minecraft.text.TextCodecs;
 import net.minecraft.util.Identifier;
 
 public record SendStickerToClientPayload(String pack, String sticker, GameProfile gameProfile, Text playerName) implements CustomPayload {
-    public static final Id<SendStickerToClientPayload> ID = new Id<>(Identifier.of("stickers", "send_sticker"));
+    public static final Id<SendStickerToClientPayload> ID = new Id<>(Identifier.of("stickers", "send_sticker_to_client"));
     public static final PacketCodec<PacketByteBuf, SendStickerToClientPayload> CODEC = PacketCodec.tuple(
             PacketCodecs.STRING,
             SendStickerToClientPayload::pack,
