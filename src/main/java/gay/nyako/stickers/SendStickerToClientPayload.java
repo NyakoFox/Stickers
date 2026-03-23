@@ -1,30 +1,30 @@
 package gay.nyako.stickers;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextCodecs;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public record SendStickerToClientPayload(String pack, String sticker, GameProfile gameProfile, Text playerName) implements CustomPayload {
-    public static final Id<SendStickerToClientPayload> ID = new Id<>(Identifier.of("stickers", "send_sticker_to_client"));
-    public static final PacketCodec<PacketByteBuf, SendStickerToClientPayload> CODEC = PacketCodec.tuple(
-            PacketCodecs.STRING,
+public record SendStickerToClientPayload(String pack, String sticker, GameProfile gameProfile, Component playerName) implements CustomPacketPayload {
+    public static final Type<SendStickerToClientPayload> ID = new Type<>(Identifier.fromNamespaceAndPath("stickers", "send_sticker_to_client"));
+    public static final StreamCodec<FriendlyByteBuf, SendStickerToClientPayload> CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8,
             SendStickerToClientPayload::pack,
-            PacketCodecs.STRING,
+            ByteBufCodecs.STRING_UTF8,
             SendStickerToClientPayload::sticker,
-            PacketCodecs.GAME_PROFILE,
+            ByteBufCodecs.GAME_PROFILE,
             SendStickerToClientPayload::gameProfile,
-            TextCodecs.PACKET_CODEC,
+            ComponentSerialization.TRUSTED_CONTEXT_FREE_STREAM_CODEC,
             SendStickerToClientPayload::playerName,
             SendStickerToClientPayload::new
     );
 
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 }

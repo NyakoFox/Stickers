@@ -1,35 +1,34 @@
 package gay.nyako.stickers;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.client.input.AbstractInput;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Style;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.ColorHelper;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.ARGB;
 
-public class StickerGroupWidget extends PressableWidget {
+public class StickerGroupWidget extends AbstractButton {
     public final StickerPack data;
     public final List<Sticker> stickerData = new ArrayList<>();
 
     private boolean selected = false;
 
     public StickerGroupWidget(int x, int y, StickerPack pack) {
-        super(x, y, 96, 16, Text.of(pack == null ? "All" : pack.getName()));
+        super(x, y, 96, 16, Component.nullToEmpty(pack == null ? "All" : pack.getName()));
         this.data = pack;
     }
 
     @Override
-    public void onPress(AbstractInput input) {
+    public void onPress(InputWithModifiers input) {
         selected = true;
         try {
-            var screen = (StickerScreen) MinecraftClient.getInstance().currentScreen;
+            var screen = (StickerScreen) Minecraft.getInstance().screen;
             screen.loadStickerPack(this);
             selected = true;
         } catch (Exception e) {
@@ -38,24 +37,24 @@ public class StickerGroupWidget extends PressableWidget {
     }
 
     @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+    protected void updateWidgetNarration(NarrationElementOutput builder) {
 
     }
 
     @Override
-    public void drawIcon(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         if (isHovered())
         {
-            context.drawStrokedRectangle(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, ColorHelper.getWhite(1));
+            graphics.outline(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, ARGB.white(1f));
         }
 
-        TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-        var text = (MutableText) Text.of(data.getName());
+        Font textRenderer = Minecraft.getInstance().font;
+        var text = (MutableComponent) Component.nullToEmpty(data.getName());
         if (selected) {
-            text = text.setStyle(Style.EMPTY.withUnderline(true));
+            text = text.setStyle(Style.EMPTY.withUnderlined(true));
         }
 
-        context.drawText(textRenderer, text, this.getX() + 4, this.getY() + 4, ColorHelper.getWhite(isHovered() ? 1f : 0.6f), true);
+        graphics.text(textRenderer, text, this.getX() + 4, this.getY() + 4, ARGB.white(isHovered() ? 1f : 0.6f), true);
     }
 
     public void clearStickers() {
@@ -74,7 +73,7 @@ public class StickerGroupWidget extends PressableWidget {
         selected = false;
     }
 
-    public boolean isSelected() {
+    public boolean isHoveredOrFocused() {
         return selected;
     }
 }

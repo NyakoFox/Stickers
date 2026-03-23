@@ -2,14 +2,13 @@ package gay.nyako.stickers;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
+import com.mojang.blaze3d.platform.NativeImage;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.texture.NativeImage;
-import net.minecraft.client.texture.NativeImageBackedTexture;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.Identifier;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileReader;
@@ -108,7 +107,7 @@ public class StickerManager {
 
         Sticker sticker = new Sticker(payload.filepath(), payload.name());
         sticker.setImage(payload.image());
-        sticker.setIdentifier(Identifier.of("stickers", payload.pack() + "/" + payload.filepath()));
+        sticker.setIdentifier(Identifier.fromNamespaceAndPath("stickers", payload.pack() + "/" + payload.filepath()));
 
         pack.addSticker(sticker);
 
@@ -118,8 +117,8 @@ public class StickerManager {
             NativeImage nativeImage = NativeImage.read(null, new ByteArrayInputStream(payload.image()));
             sticker.width = nativeImage.getWidth();
             sticker.height = nativeImage.getHeight();
-            NativeImageBackedTexture nativeImageBackedTexture = new NativeImageBackedTexture(() -> "Sticker " + sticker.identifier.toString(), nativeImage);
-            MinecraftClient.getInstance().getTextureManager().registerTexture(sticker.identifier, nativeImageBackedTexture);
+            DynamicTexture dynamicTexture = new DynamicTexture(sticker.identifier::toString, nativeImage);
+            Minecraft.getInstance().getTextureManager().register(sticker.identifier, dynamicTexture);
         } catch (Exception e) {
             StickersMod.LOGGER.warn("Failed to load image from byte array", e);
         }

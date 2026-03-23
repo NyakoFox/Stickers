@@ -1,48 +1,46 @@
 package gay.nyako.stickers;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.widget.PressableWidget;
-import net.minecraft.client.input.AbstractInput;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.ColorHelper;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.input.InputWithModifiers;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.ARGB;
 
-public class StickerWidget extends PressableWidget {
+public class StickerWidget extends AbstractButton {
     public final Sticker data;
     public final String stickerPackId;
     public StickerWidget(int x, int y, Sticker data, String stickerPackId) {
-        super(x, y, 64, 64, Text.of(data.title));
+        super(x, y, 64, 64, Component.nullToEmpty(data.title));
         this.data = data;
         this.stickerPackId = stickerPackId;
     }
 
     @Override
-    public void onPress(AbstractInput input) {
+    public void onPress(InputWithModifiers input) {
         for (StickerDisplay sticker : StickerSystem.STICKERS)
         {
-            if (sticker.playerUUID.equals(MinecraftClient.getInstance().player.getUuid()) && StickerSystem.stickerDelay > 0) {
+            if (sticker.playerUUID.equals(Minecraft.getInstance().player.getUUID()) && StickerSystem.STICKER_TIMEOUT > 0) {
                 return;
             }
         }
 
-        MinecraftClient.getInstance().setScreen(null);
+        Minecraft.getInstance().setScreen(null);
         StickerSystem.showSticker(stickerPackId, data);
     }
 
     @Override
-    protected void appendClickableNarrations(NarrationMessageBuilder builder) {
+    protected void updateWidgetNarration(NarrationElementOutput builder) {
 
     }
 
     @Override
-    public void drawIcon(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float delta) {
         if (isHovered())
         {
-            context.drawStrokedRectangle(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, 0xFFFFFFFF);
+            graphics.outline(this.getX() - 1, this.getY() - 1, this.width + 2, this.height + 2, 0xFFFFFFFF);
         }
 
         float aspectRatio = data.width / data.height;
@@ -61,6 +59,6 @@ public class StickerWidget extends PressableWidget {
         int drawX = (int) (this.getX() + (StickerSystem.STICKER_WIDTH - drawWidth) / 2f);
         int drawY = (int) (this.getY() + (StickerSystem.STICKER_HEIGHT - drawHeight) / 2f);
 
-        context.drawTexture(RenderPipelines.GUI_TEXTURED, this.data.identifier, drawX, drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ColorHelper.getWhite(this.alpha * (isHovered() ? 1f : 0.8f)));
+        graphics.blit(RenderPipelines.GUI_TEXTURED, this.data.identifier, drawX, drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, isHovered() ? ARGB.white(1f) : ARGB.colorFromFloat(1F, 0.8F, 0.8F, 0.8F));
     }
 }

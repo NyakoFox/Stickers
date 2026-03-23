@@ -3,10 +3,9 @@ package gay.nyako.stickers;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-
 import java.util.*;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 public record StickerPackCollection(List<String> stickerPacks) {
     public static final Codec<StickerPackCollection> CODEC = RecordCodecBuilder.create(
@@ -15,10 +14,10 @@ public record StickerPackCollection(List<String> stickerPacks) {
             ).apply(instance, StickerPackCollection::new)
     );
 
-    public static PacketCodec<ByteBuf, StickerPackCollection> PACKET_CODEC = PacketCodecs.codec(CODEC);
+    public static StreamCodec<ByteBuf, StickerPackCollection> PACKET_CODEC = ByteBufCodecs.fromCodec(CODEC);
 
     public StickerPackCollection() {
-        this(List.copyOf(StickersMod.CONFIG.defaultPacks()));
+        this(List.of());
     }
 
     public boolean hasStickerPack(String sticker) {

@@ -1,6 +1,6 @@
 package gay.nyako.stickers;
 
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class Sticker {
     public String filename;

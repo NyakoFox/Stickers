@@ -1,18 +1,16 @@
 package gay.nyako.stickers;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gl.RenderPipelines;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.ColorHelper;
-import net.minecraft.util.math.MathHelper;
-
 import java.util.UUID;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.ARGB;
+
 public class StickerDisplay {
-    private final Text playerName;
+    private final Component playerName;
     private final Sticker stickerData;
     public UUID playerUUID;
     public float ticks;
@@ -23,7 +21,7 @@ public class StickerDisplay {
     private float targetY;
     private float smoothedDeltaTime;
 
-    public StickerDisplay(Text playerName, Sticker stickerData, UUID playerUUID) {
+    public StickerDisplay(Component playerName, Sticker stickerData, UUID playerUUID) {
         this.playerName = playerName;
         this.stickerData = stickerData;
         this.playerUUID = playerUUID;
@@ -43,16 +41,19 @@ public class StickerDisplay {
         targetY = y;
     }
 
-    public void render(DrawContext drawContext, float tickDelta)
+    public void render(GuiGraphicsExtractor guiGraphicsExtractor)
     {
+        guiGraphicsExtractor.nextStratum();
+        guiGraphicsExtractor.pose().pushMatrix();
+
         float width = stickerData.width;
         float height = stickerData.height;
 
         if (currentX == -1) {
-            currentX = drawContext.getScaledWindowWidth();
+            currentX = guiGraphicsExtractor.guiWidth();
         }
         if (currentY == -1) {
-            currentY = drawContext.getScaledWindowHeight() / 2f - (StickerSystem.STICKER_HEIGHT / 2f);
+            currentY = guiGraphicsExtractor.guiHeight() / 2f - (StickerSystem.STICKER_HEIGHT / 2f);
         }
 
         float smoothing = 8f;
@@ -90,13 +91,15 @@ public class StickerDisplay {
         float drawX = currentX + (StickerSystem.STICKER_WIDTH - drawWidth) / 2f;
         float drawY = currentY + (StickerSystem.STICKER_HEIGHT - drawHeight) / 2f;
 
-        drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, stickerData.identifier, (int) drawX + 1, (int) drawY + 1, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ColorHelper.fromFloats(0, 0, 0, 0.5f));
-        drawContext.drawTexture(RenderPipelines.GUI_TEXTURED, stickerData.identifier, (int) drawX, (int) drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ColorHelper.getWhite(1));
+        guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, stickerData.identifier, (int) drawX + 1, (int) drawY + 1, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ARGB.colorFromFloat(0f, 0f, 0f, 0.5f));
+        guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, stickerData.identifier, (int) drawX, (int) drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ARGB.white(1f));
 
         if (playerName != null) {
-            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            drawContext.drawText(textRenderer, playerName, (int) (drawX + (StickerSystem.STICKER_WIDTH / 2f) - textRenderer.getWidth(playerName) / 2f), (int) drawY - 8, 0xFFFFFFFF, true);
+            Font textRenderer = Minecraft.getInstance().font;
+            guiGraphicsExtractor.text(textRenderer, playerName, (int) (drawX + (StickerSystem.STICKER_WIDTH / 2f) - textRenderer.width(playerName) / 2f), (int) drawY - 8, 0xFFFFFFFF, true);
         }
+
+        guiGraphicsExtractor.pose().popMatrix();
     }
 
     public void tick() {

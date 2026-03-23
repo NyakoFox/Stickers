@@ -1,18 +1,18 @@
 package gay.nyako.stickers;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.Drawable;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.tooltip.Tooltip;
-import net.minecraft.client.gui.widget.MultilineTextWidget;
-import net.minecraft.client.gui.widget.TextWidget;
-import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
-
-import java.text.Format;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.components.MultiLineTextWidget;
+import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.client.gui.components.StringWidget;
+import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,14 +30,14 @@ public class StickerScreen extends Screen {
     private final List<StickerWidget> stickers = Lists.newArrayList();
 
     public StickerScreen() {
-        super(Text.translatable("stickers.title"));
+        super(Component.translatable("stickers.title"));
     }
 
     @Override
     protected void init() {
         for (var pack : stickerPacks.values()) {
             pack.clearStickers();
-            this.remove(pack);
+            this.removeWidget(pack);
         }
 
         stickerPacks.clear();
@@ -54,11 +54,11 @@ public class StickerScreen extends Screen {
         }
         else
         {
-            var line1 = addDrawableChild(new TextWidget(Text.literal("You have no sticker packs!").setStyle(Style.EMPTY.withColor(0xFFAAAAAA)), this.textRenderer));
+            var line1 = addRenderableWidget(new StringWidget(Component.literal("You have no sticker packs!").setStyle(Style.EMPTY.withColor(0xFFAAAAAA)), this.font));
             line1.setX((width / 2) - (line1.getWidth() / 2));
             line1.setY((height / 2) - line1.getHeight() - 8);
 
-            var line2 = addDrawableChild(new MultilineTextWidget(Text.literal("Either your sticker pack collection is empty,\nor the server does not support stickers.").setStyle(Style.EMPTY.withColor(0xFFAAAAAA)), this.textRenderer));
+            var line2 = addRenderableWidget(new MultiLineTextWidget(Component.literal("Either your sticker pack collection is empty,\nor the server does not support stickers.").setStyle(Style.EMPTY.withColor(0xFFAAAAAA)), this.font));
             line2.setX((width / 2) - (line2.getWidth() / 2));
             line2.setY((height / 2) + 8);
         }
@@ -67,7 +67,7 @@ public class StickerScreen extends Screen {
     }
 
     private void addStickerPack(String key, StickerPack value) {
-        if (MinecraftClient.getInstance().player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION).hasStickerPack(key))
+        if (Minecraft.getInstance().player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION).hasStickerPack(key))
         {
             for (var sticker : value.getStickers()) {
                 addSticker(key, sticker);
@@ -90,14 +90,14 @@ public class StickerScreen extends Screen {
 
             StickerWidget button = new StickerWidget(0, 0, stickerData, packID);
 
-            button.setTooltip(Tooltip.of(
-                    Text.translatable(
+            button.setTooltip(Tooltip.create(
+                    Component.translatable(
                             "stickers.stickers.sticker_tooltip",
-                            ((MutableText) Text.of(stickerData.title)).formatted(Formatting.AQUA),
-                            ((MutableText) Text.of(pack.data.getName())).formatted(Formatting.WHITE)
-                    ).formatted(Formatting.GRAY)
+                            ((MutableComponent) Component.nullToEmpty(stickerData.title)).withStyle(ChatFormatting.AQUA),
+                            ((MutableComponent) Component.nullToEmpty(pack.data.getName())).withStyle(ChatFormatting.WHITE)
+                    ).withStyle(ChatFormatting.GRAY)
             ));
-            this.addDrawableChild(button);
+            this.addRenderableWidget(button);
 
             stickers.add(button);
         }
@@ -113,7 +113,7 @@ public class StickerScreen extends Screen {
 
     private void clearStickers() {
         for (var sticker : stickers) {
-            this.remove(sticker);
+            this.removeWidget(sticker);
         }
         stickers.clear();
     }
@@ -193,7 +193,7 @@ public class StickerScreen extends Screen {
         if (!stickerPacks.containsKey(pack)) {
             var widget = new StickerGroupWidget(0, 0, StickersMod.STICKER_MANAGER.stickerPacks.get(pack));
             stickerPacks.put(pack, widget);
-            this.addSelectableChild(widget);
+            this.addWidget(widget);
         }
 
         return stickerPacks.get(pack);
@@ -209,18 +209,18 @@ public class StickerScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
+        super.extractRenderState(context, mouseX, mouseY, delta);
 
         if (!orderedStickerPacks.isEmpty()) {
-            for (Drawable drawable : stickerPacks.values()) {
+            for (Renderable drawable : stickerPacks.values()) {
                 context.enableScissor(0, 32, SIDEBAR_WIDTH, this.height - 32);
-                drawable.render(context, mouseX, mouseY, delta);
+                drawable.extractRenderState(context, mouseX, mouseY, delta);
                 context.disableScissor();
             }
-            TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
-            var label = Text.literal("Sticker Packs").setStyle(Style.EMPTY.withUnderline(true));
-            context.drawText(textRenderer, label, 28, 20, 0xFFFFFFFF, true);
+            Font textRenderer = Minecraft.getInstance().font;
+            var label = Component.literal("Sticker Packs").setStyle(Style.EMPTY.withUnderlined(true));
+            context.text(textRenderer, label, 28, 20, 0xFFFFFFFF, true);
         }
 
         this.mouseX = mouseX;
@@ -228,7 +228,7 @@ public class StickerScreen extends Screen {
     }
 
     @Override
-    public void renderBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void extractBackground(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         context.fill(0, 0, this.width, this.height, 0x88000000);
 
         if (!orderedStickerPacks.isEmpty()) {

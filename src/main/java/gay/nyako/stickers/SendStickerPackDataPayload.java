@@ -1,23 +1,23 @@
 package gay.nyako.stickers;
 
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.network.codec.PacketCodec;
-import net.minecraft.network.codec.PacketCodecs;
-import net.minecraft.network.packet.CustomPayload;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.Identifier;
 
-public record SendStickerPackDataPayload(String pack, String name) implements CustomPayload {
-    public static final Id<SendStickerPackDataPayload> ID = new Id<>(Identifier.of("stickers", "send_sticker_pack_data"));
-    public static final PacketCodec<PacketByteBuf, SendStickerPackDataPayload> CODEC = PacketCodec.tuple(
-            PacketCodecs.STRING,
+public record SendStickerPackDataPayload(String pack, String name) implements CustomPacketPayload {
+    public static final Type<SendStickerPackDataPayload> ID = new Type<>(Identifier.fromNamespaceAndPath("stickers", "send_sticker_pack_data"));
+    public static final StreamCodec<FriendlyByteBuf, SendStickerPackDataPayload> CODEC = StreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8,
             SendStickerPackDataPayload::pack,
-            PacketCodecs.STRING,
+            ByteBufCodecs.STRING_UTF8,
             SendStickerPackDataPayload::name,
             SendStickerPackDataPayload::new
     );
 
     @Override
-    public Id<? extends CustomPayload> getId() {
+    public Type<? extends CustomPacketPayload> type() {
         return ID;
     }
 }

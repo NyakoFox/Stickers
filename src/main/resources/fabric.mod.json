@@ -29,7 +29,6 @@
 		"fabricloader": ">=${loader_version}",
 		"minecraft": "${minecraft_minimum_version}",
 		"java": ">=21",
-		"fabric-api": "*",
-		"owo": "*"
+		"fabric-api": "*"
 	}
 }

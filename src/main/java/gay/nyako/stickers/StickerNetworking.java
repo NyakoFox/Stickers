@@ -5,28 +5,28 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.Text;
 
 public class StickerNetworking {
     public static void registerReceivers() {
         // Sending stickers
-        PayloadTypeRegistry.playC2S().register(SendStickerPayload.ID, SendStickerPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(SendStickerToClientPayload.ID, SendStickerToClientPayload.CODEC);
+        PayloadTypeRegistry.serverboundPlay().register(SendStickerPayload.ID, SendStickerPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(SendStickerToClientPayload.ID, SendStickerToClientPayload.CODEC);
 
         // Sticker pack manipulation commands
-        PayloadTypeRegistry.playS2C().register(AddStickerPackPayload.ID, AddStickerPackPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(RemoveStickerPackPayload.ID, RemoveStickerPackPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(AddStickerPackPayload.ID, AddStickerPackPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(RemoveStickerPackPayload.ID, RemoveStickerPackPayload.CODEC);
 
         // Sending initial sticker data
-        PayloadTypeRegistry.playS2C().register(SendStickerDataPayload.ID, SendStickerDataPayload.CODEC);
-        PayloadTypeRegistry.playS2C().register(SendStickerPackDataPayload.ID, SendStickerPackDataPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(SendStickerDataPayload.ID, SendStickerDataPayload.CODEC);
+        PayloadTypeRegistry.clientboundPlay().register(SendStickerPackDataPayload.ID, SendStickerPackDataPayload.CODEC);
 
         ServerPlayNetworking.registerGlobalReceiver(SendStickerPayload.ID,
                 (payload, context) -> {
                     context.server().execute(() -> {
-                        context.server().getPlayerManager().getPlayerList().forEach((serverPlayerEntity) -> {
-                            Text name = serverPlayerEntity.getDisplayName();
+                        context.server().getPlayerList().getPlayers().forEach((serverPlayerEntity) -> {
+                            Component name = serverPlayerEntity.getDisplayName();
                             if (ServerPlayNetworking.canSend(serverPlayerEntity, SendStickerToClientPayload.ID)) {
                                 ServerPlayNetworking.send(serverPlayerEntity, new SendStickerToClientPayload(payload.pack(), payload.name(), context.player().getGameProfile(), name));
                             }
@@ -56,13 +56,13 @@ public class StickerNetworking {
                             return;
                         }
 
-                        Text playerName = payload.playerName();
+                        Component playerName = payload.playerName();
                         if (playerName == null) {
-                             playerName = Text.of(payload.gameProfile().name());
+                             playerName = Component.nullToEmpty(payload.gameProfile().name());
                         }
 
                         if (playerName == null) {
-                            playerName = Text.empty();
+                            playerName = Component.empty();
                         }
 
                         StickerSystem.addSticker(playerName, stickerData, payload.gameProfile().id());

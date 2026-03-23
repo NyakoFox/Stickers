@@ -3,11 +3,11 @@ package gay.nyako.stickers;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentRegistry;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentSyncPredicate;
 import net.fabricmc.fabric.api.attachment.v1.AttachmentType;
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.Identifier;
 
 public class StickerAttachmentTypes {
     public static final AttachmentType<StickerPackCollection> STICKER_COLLECTION = AttachmentRegistry.create(
-            Identifier.of("stickers", "sticker_collection"),
+            Identifier.fromNamespaceAndPath("stickers", "sticker_collection"),
             builder -> builder
                     .initializer(StickerPackCollection::new)
                     .persistent(StickerPackCollection.CODEC)
