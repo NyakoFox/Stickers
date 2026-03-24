@@ -39,53 +39,99 @@ public class StickerPackCommand {
                         })
                         .then(Commands.literal("add")
                                 .then(Commands.argument("stickerpack", StringArgumentType.string())
-                                        .suggests(StickersMod.STICKER_PACK_SUGGESTION_PROVIDER)
+                                        .suggests(new StickerPackSuggestionProvider(false))
                                         .executes(context -> {
                                             // add a sticker pack to the player
                                             Collection<NameAndId> profiles = GameProfileArgument.getGameProfiles(context, "player");
                                             String stickerPack = StringArgumentType.getString(context, "stickerpack");
-                                            profiles.forEach(profile -> {
+                                            if (profiles.isEmpty())
+                                            {
+                                                context.getSource().sendFailure(Component.nullToEmpty("No players selected."));
+                                                return 0;
+                                            }
+
+                                            int return_value = 0;
+
+                                            for (NameAndId profile : profiles) {
                                                 ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(profile.id());
-                                                if (player != null) {
-                                                    StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
-                                                    player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.addStickerPack(stickerPack));
-                                                    if (ServerPlayNetworking.canSend(player, AddStickerPackPayload.ID)) {
-                                                        ServerPlayNetworking.send(player, new AddStickerPackPayload(stickerPack));
+                                                if (player == null) {
+                                                    if (profiles.size() == 1) {
+                                                        context.getSource().sendFailure(Component.nullToEmpty("Player " + profile.name() + " is not online"));
+                                                        return 0;
                                                     }
-                                                    context.getSource().sendSuccess(() -> Component.nullToEmpty("Added sticker pack to " + profile.name()), false);
+                                                    continue;
                                                 }
-                                                else
-                                                {
-                                                    context.getSource().sendSuccess(() -> Component.nullToEmpty("Player " + profile.name() + " is not online"), false);
+
+                                                StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
+                                                if (collection.hasStickerPack(stickerPack)) {
+                                                    if (profiles.size() == 1) {
+                                                        // Only a single person; error if they already have it
+                                                        context.getSource().sendFailure(Component.nullToEmpty("Player " + profile.name() + " already has that pack."));
+                                                        return 0;
+                                                    }
+                                                    continue;
                                                 }
-                                            });
-                                            return Command.SINGLE_SUCCESS;
+
+                                                player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.addStickerPack(stickerPack));
+
+                                                if (ServerPlayNetworking.canSend(player, AddStickerPackPayload.ID)) {
+                                                    ServerPlayNetworking.send(player, new AddStickerPackPayload(stickerPack));
+                                                }
+
+                                                context.getSource().sendSuccess(() -> Component.nullToEmpty("Added sticker pack " + stickerPack + " to " + profile.name()), false);
+                                                return_value++;
+                                            }
+
+                                            return return_value;
                                         })
                                 )
                         )
                         .then(Commands.literal("remove")
                                 .then(Commands.argument("stickerpack", StringArgumentType.string())
-                                        .suggests(StickersMod.STICKER_PACK_SUGGESTION_PROVIDER)
+                                        .suggests(new StickerPackSuggestionProvider(true))
                                         .executes(context -> {
                                             // remove a sticker pack from the player
                                             Collection<NameAndId> profiles = GameProfileArgument.getGameProfiles(context, "player");
                                             String stickerPack = StringArgumentType.getString(context, "stickerpack");
-                                            profiles.forEach(profile -> {
+
+                                            if (profiles.isEmpty())
+                                            {
+                                                context.getSource().sendFailure(Component.nullToEmpty("No players selected."));
+                                                return 0;
+                                            }
+
+                                            int return_value = 0;
+
+                                            for (NameAndId profile : profiles) {
                                                 ServerPlayer player = context.getSource().getServer().getPlayerList().getPlayer(profile.id());
-                                                if (player != null) {
-                                                    StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
-                                                    player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.removeStickerPack(stickerPack));
-                                                    if (ServerPlayNetworking.canSend(player, RemoveStickerPackPayload.ID)) {
-                                                        ServerPlayNetworking.send(player, new RemoveStickerPackPayload(stickerPack));
+                                                if (player == null) {
+                                                    if (profiles.size() == 1) {
+                                                        context.getSource().sendFailure(Component.nullToEmpty("Player " + profile.name() + " is not online"));
+                                                        return 0;
                                                     }
-                                                    context.getSource().sendSuccess(() -> Component.nullToEmpty("Removed sticker pack from " + profile.name()), false);
+                                                    continue;
                                                 }
-                                                else
-                                                {
-                                                    context.getSource().sendSuccess(() -> Component.nullToEmpty("Player " + profile.name() + " is not online"), false);
+
+                                                StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
+                                                if (!collection.hasStickerPack(stickerPack)) {
+                                                    if (profiles.size() == 1) {
+                                                        // Only a single person; error if they don't have it
+                                                        context.getSource().sendFailure(Component.nullToEmpty("Player " + profile.name() + " does not have that pack."));
+                                                        return 0;
+                                                    }
+                                                    continue;
                                                 }
-                                            });
-                                            return Command.SINGLE_SUCCESS;
+
+                                                player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.removeStickerPack(stickerPack));
+
+                                                if (ServerPlayNetworking.canSend(player, RemoveStickerPackPayload.ID)) {
+                                                    ServerPlayNetworking.send(player, new RemoveStickerPackPayload(stickerPack));
+                                                }
+
+                                                context.getSource().sendSuccess(() -> Component.nullToEmpty("Removed sticker pack " + stickerPack + " from " + profile.name()), false);
+                                                return_value++;
+                                            }
+                                            return return_value;
                                         })
                                 )
                         )
