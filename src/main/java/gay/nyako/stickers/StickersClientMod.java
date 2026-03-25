@@ -1,6 +1,8 @@
 package gay.nyako.stickers;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import gay.nyako.stickers.networking.StickerNetworking;
+import gay.nyako.stickers.screen.StickerScreen;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
@@ -24,7 +26,7 @@ public class StickersClientMod implements ClientModInitializer {
 
         ClientTickEvents.START_CLIENT_TICK.register(StickerSystem::tick);
 
-        HudElementRegistry.attachElementAfter(VanillaHudElements.CHAT, Identifier.fromNamespaceAndPath("stickers", "sticker_render"), StickerSystem::render);
+        HudElementRegistry.attachElementAfter(VanillaHudElements.CHAT, Identifier.fromNamespaceAndPath("stickers", "sticker_render"), StickerSystem::extractRenderState);
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (STICKER_KEYBIND.consumeClick()) {

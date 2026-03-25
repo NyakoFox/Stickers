@@ -1,7 +1,10 @@
-package gay.nyako.stickers;
+package gay.nyako.stickers.screen;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import gay.nyako.stickers.Sticker;
+import gay.nyako.stickers.StickerPack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;

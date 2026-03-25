@@ -1,7 +1,9 @@
-package gay.nyako.stickers;
+package gay.nyako.stickers.rendering;
 
 import java.util.UUID;
 
+import gay.nyako.stickers.Sticker;
+import gay.nyako.stickers.StickerSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -13,7 +15,7 @@ public class StickerDisplay {
     private final Component playerName;
     private final Sticker stickerData;
     public UUID playerUUID;
-    public float ticks;
+    private int ticks;
     private float lastFrameTime;
     private float currentX;
     private float currentY;
@@ -36,24 +38,26 @@ public class StickerDisplay {
         smoothedDeltaTime = 0.05f; // default to 20 TPS
     }
 
+    public int getTicks()
+    {
+        return ticks;
+    }
+
     public void setTarget(float x, float y) {
         targetX = x;
         targetY = y;
     }
 
-    public void render(GuiGraphicsExtractor guiGraphicsExtractor)
+    public void extractRenderState(GuiGraphicsExtractor graphics)
     {
-        guiGraphicsExtractor.nextStratum();
-        guiGraphicsExtractor.pose().pushMatrix();
-
         float width = stickerData.width;
         float height = stickerData.height;
 
         if (currentX == -1) {
-            currentX = guiGraphicsExtractor.guiWidth();
+            currentX = graphics.guiWidth();
         }
         if (currentY == -1) {
-            currentY = guiGraphicsExtractor.guiHeight() / 2f - (StickerSystem.STICKER_HEIGHT / 2f);
+            currentY = graphics.guiHeight() / 2f - (StickerSystem.STICKER_HEIGHT / 2f);
         }
 
         float smoothing = 8f;
@@ -91,18 +95,16 @@ public class StickerDisplay {
         float drawX = currentX + (StickerSystem.STICKER_WIDTH - drawWidth) / 2f;
         float drawY = currentY + (StickerSystem.STICKER_HEIGHT - drawHeight) / 2f;
 
-        guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, stickerData.identifier, (int) drawX + 1, (int) drawY + 1, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ARGB.colorFromFloat(0f, 0f, 0f, 0.5f));
-        guiGraphicsExtractor.blit(RenderPipelines.GUI_TEXTURED, stickerData.identifier, (int) drawX, (int) drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ARGB.white(1f));
+        graphics.blit(RenderPipelines.GUI_TEXTURED, stickerData.identifier, (int) drawX + 1, (int) drawY + 1, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ARGB.colorFromFloat(0f, 0f, 0f, 0.5f));
+        graphics.blit(RenderPipelines.GUI_TEXTURED, stickerData.identifier, (int) drawX, (int) drawY, 0, 0, drawWidth, drawHeight, drawWidth, drawHeight, ARGB.white(1f));
 
         if (playerName != null) {
             Font textRenderer = Minecraft.getInstance().font;
-            guiGraphicsExtractor.text(textRenderer, playerName, (int) (drawX + (StickerSystem.STICKER_WIDTH / 2f) - textRenderer.width(playerName) / 2f), (int) drawY - 8, 0xFFFFFFFF, true);
+            graphics.text(textRenderer, playerName, (int) (drawX + (StickerSystem.STICKER_WIDTH / 2f) - textRenderer.width(playerName) / 2f), (int) drawY - 8, 0xFFFFFFFF, true);
         }
-
-        guiGraphicsExtractor.pose().popMatrix();
     }
 
     public void tick() {
-
+        ticks++;
     }
 }

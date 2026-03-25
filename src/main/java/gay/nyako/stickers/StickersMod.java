@@ -1,26 +1,24 @@
 package gay.nyako.stickers;
 
-import com.mojang.brigadier.suggestion.SuggestionProvider;
+import gay.nyako.stickers.commands.StickerPackCommand;
+import gay.nyako.stickers.config.StickersConfig;
+import gay.nyako.stickers.networking.SendStickerDataPayload;
+import gay.nyako.stickers.networking.SendStickerPackDataPayload;
+import gay.nyako.stickers.networking.StickerNetworking;
 import net.fabricmc.api.ModInitializer;
 
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.commands.arguments.GameProfileArgument;
-import net.minecraft.commands.synchronization.SuggestionProviders;
-import net.minecraft.resources.Identifier;
-import net.minecraft.server.players.NameAndId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Collection;
 
 public class StickersMod implements ModInitializer {
 	public static final StickerManager STICKER_MANAGER = new StickerManager();
 
 	public static final Logger LOGGER = LoggerFactory.getLogger("Stickers");
+	public static final StickersConfig CONFIG = StickersConfig.createAndLoad();
 
 	@Override
 	public void onInitialize() {

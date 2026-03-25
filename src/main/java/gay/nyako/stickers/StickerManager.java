@@ -3,6 +3,8 @@ package gay.nyako.stickers;
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.mojang.blaze3d.platform.NativeImage;
+import gay.nyako.stickers.networking.SendStickerDataPayload;
+import gay.nyako.stickers.networking.SendStickerPackDataPayload;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.loader.api.FabricLoader;

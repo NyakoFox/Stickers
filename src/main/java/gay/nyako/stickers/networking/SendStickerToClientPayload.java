@@ -1,4 +1,4 @@
-package gay.nyako.stickers;
+package gay.nyako.stickers.networking;
 
 import com.mojang.authlib.GameProfile;
 import net.minecraft.network.FriendlyByteBuf;

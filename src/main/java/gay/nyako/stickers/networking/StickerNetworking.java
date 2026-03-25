@@ -1,12 +1,12 @@
-package gay.nyako.stickers;
+package gay.nyako.stickers.networking;
 
+import gay.nyako.stickers.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.MinecraftServer;
 
 public class StickerNetworking {
     public static void registerReceivers() {
@@ -74,7 +74,7 @@ public class StickerNetworking {
                     context.client().execute(() -> {
                         var player = context.client().player;
                         var collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
-                        player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.addStickerPack(payload.string()));
+                        player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.addPack(payload.string()));
                     });
                 }
         );

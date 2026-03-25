@@ -1,6 +1,7 @@
-package gay.nyako.stickers;
+package gay.nyako.stickers.screen;
 
 import com.google.common.collect.Lists;
+import gay.nyako.stickers.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -67,7 +68,7 @@ public class StickerScreen extends Screen {
     }
 
     private void addStickerPack(String key, StickerPack value) {
-        if (Minecraft.getInstance().player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION).hasStickerPack(key))
+        if (Minecraft.getInstance().player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION).hasPack(key))
         {
             for (var sticker : value.getStickers()) {
                 addSticker(key, sticker);

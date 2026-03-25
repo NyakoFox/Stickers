@@ -1,8 +1,13 @@
-package gay.nyako.stickers;
+package gay.nyako.stickers.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import gay.nyako.stickers.StickerAttachmentTypes;
+import gay.nyako.stickers.StickerPackCollection;
+import gay.nyako.stickers.StickerSystem;
+import gay.nyako.stickers.networking.AddStickerPackPayload;
+import gay.nyako.stickers.networking.RemoveStickerPackPayload;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -26,7 +31,7 @@ public class StickerPackCommand {
                                 if (player != null) {
                                     context.getSource().sendSuccess(() -> Component.nullToEmpty("Player " + profile.name() + " has the following sticker packs:"), false);
                                     StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
-                                    collection.stickerPacks().forEach(stickerPack -> {
+                                    collection.getPacks().forEach(stickerPack -> {
                                         context.getSource().sendSuccess(() -> Component.nullToEmpty(stickerPack), false);
                                     });
                                 }
@@ -62,8 +67,8 @@ public class StickerPackCommand {
                                                     continue;
                                                 }
 
-                                                StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
-                                                if (collection.hasStickerPack(stickerPack)) {
+                                                StickerPackCollection collection = StickerSystem.getCollection(player);
+                                                if (collection.hasPack(stickerPack)) {
                                                     if (profiles.size() == 1) {
                                                         // Only a single person; error if they already have it
                                                         context.getSource().sendFailure(Component.nullToEmpty("Player " + profile.name() + " already has that pack."));
@@ -72,7 +77,7 @@ public class StickerPackCommand {
                                                     continue;
                                                 }
 
-                                                player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.addStickerPack(stickerPack));
+                                                player.setAttached(StickerAttachmentTypes.STICKER_COLLECTION, collection.addPack(stickerPack));
 
                                                 if (ServerPlayNetworking.canSend(player, AddStickerPackPayload.ID)) {
                                                     ServerPlayNetworking.send(player, new AddStickerPackPayload(stickerPack));
@@ -112,8 +117,8 @@ public class StickerPackCommand {
                                                     continue;
                                                 }
 
-                                                StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
-                                                if (!collection.hasStickerPack(stickerPack)) {
+                                                StickerPackCollection collection = StickerSystem.getCollection(player);
+                                                if (!collection.hasPack(stickerPack)) {
                                                     if (profiles.size() == 1) {
                                                         // Only a single person; error if they don't have it
                                                         context.getSource().sendFailure(Component.nullToEmpty("Player " + profile.name() + " does not have that pack."));

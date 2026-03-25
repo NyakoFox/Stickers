@@ -1,4 +1,4 @@
-package gay.nyako.stickers;
+package gay.nyako.stickers.networking;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;

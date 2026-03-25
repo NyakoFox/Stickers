@@ -1,5 +1,8 @@
-package gay.nyako.stickers;
+package gay.nyako.stickers.screen;
 
+import gay.nyako.stickers.Sticker;
+import gay.nyako.stickers.StickerSystem;
+import gay.nyako.stickers.rendering.StickerDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.AbstractButton;

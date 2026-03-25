@@ -1,13 +1,15 @@
-package gay.nyako.stickers;
+package gay.nyako.stickers.commands;
 
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.SuggestionProvider;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import gay.nyako.stickers.StickerAttachmentTypes;
+import gay.nyako.stickers.StickerPackCollection;
+import gay.nyako.stickers.StickersMod;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.GameProfileArgument;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.NameAndId;
 
@@ -44,7 +46,7 @@ public class StickerPackSuggestionProvider implements SuggestionProvider<Command
                 }
 
                 StickerPackCollection collection = player.getAttachedOrCreate(StickerAttachmentTypes.STICKER_COLLECTION);
-                if (list_inverted == collection.hasStickerPack(key))
+                if (list_inverted == collection.hasPack(key))
                 {
                     // List ones they don't have
                     // if inverted, it'll list ones they DO have

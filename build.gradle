@@ -11,6 +11,24 @@ base {
 }
 
 repositories {
+	maven {
+		/* Mod Menu */
+		name = "Terraformers"
+		url = "https://maven.terraformersmc.com/"
+	}
+	maven {
+		/* TextPlaceholderAPI (required by Mod Menu) */
+		name = "Nucleoid"
+		url = "https://maven.nucleoid.xyz/"
+	}
+	maven {
+		/* owo */
+		url 'https://maven.wispforest.io/releases/'
+	}
+	maven {
+		/* owo */
+		url 'https://jitpack.io'
+	}
 }
 
 dependencies {
@@ -21,6 +39,10 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
 
+	implementation "com.terraformersmc:modmenu:${project.modmenu_version}"
+	annotationProcessor implementation("io.wispforest:owo-lib:${project.owo_version}")
+	include "io.wispforest:owo-sentinel:${project.owo_version}"
+
 	include implementation("blue.endless:jankson:1.2.3")
 }
 
@@ -28,7 +50,8 @@ processResources {
 	inputs.properties([
 		"version": project.version,
 		"loader_version": project.loader_version,
-		"minecraft_minimum_version": project.minecraft_minimum_version
+		"minecraft_minimum_version": project.minecraft_minimum_version,
+		"owo_version": project.owo_version
 	])
 
 	filesMatching("fabric.mod.json") {
@@ -37,7 +60,7 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach {
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
@@ -46,8 +69,8 @@ java {
 	// If you remove this line, sources will not be generated.
 	withSourcesJar()
 
-	sourceCompatibility = JavaVersion.VERSION_21
-	targetCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
 }
 
 jar {
